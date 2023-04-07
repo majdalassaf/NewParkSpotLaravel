@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\Car_Controller;
+use App\Http\Controllers\SlotController;
+
+
+
 use App\Http\Controllers\UserController;
-
-
-
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Zone_Controller;
 use App\Http\Controllers\TransactionController;
@@ -58,6 +59,8 @@ Route::group([
     ],function (){
     Route::get('check',[AdminController::class,'index']);
     Route::post('create_book_admin',[BookController::class,'create_book_admin']);
+    Route::get('Get_All_Slot',[SlotController::class,'Get_All_Slot']);
+
 
 
 

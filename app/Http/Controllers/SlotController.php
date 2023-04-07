@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Slot;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SlotController extends Controller
 {
@@ -53,6 +54,20 @@ class SlotController extends Controller
             'status' =>false,
             'is_locked' => false
         ]);
+
+    }
+
+    public function Get_All_Slot()
+    {
+        $Request_admin = Auth::guard('admin')->user();
+
+        $slot_admin = Slot::where('Zone_id', $Request_admin->zone_id)->get();
+        if($slot_admin)
+            return $this->returnResponse($slot_admin,"All Slot",200);
+
+        return $this->returnResponse("","No fount",404);
+
+
 
     }
 
