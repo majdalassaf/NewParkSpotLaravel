@@ -92,8 +92,67 @@ use TraitApiResponse;
         return $this->returnResponse('','Password has not been changed', 400);
 
     }
+    public function Update_User_Phone(Request $request){
+        $rules=[
+            "phone"=> "required|max:10|min:10"
+        ];
+        $validator=Validator::make($request->all(),$rules);
+        if($validator->fails())
+            return $this->returnResponse('',$validator->errors()->first(),400);
 
+        $Request_user = Auth::guard('user')->user();
 
+        $user=User::where('id', $Request_user->id)->first();
+        if($Request_user->phone == $request->phone)
+            return $this->returnResponse('','This is the same phone', 400);
+        $result=$user->update([
+            'phone'=>$request->phone
+        ]);
+        if($result)
+            return $this->returnResponse('','phone has been changed', 200);
 
+        return $this->returnResponse('','phone has not been changed', 400);
+
+    }
+
+    public function Update_User_Name(Request $request){
+        $rules=[
+            "name"=> "required"
+        ];
+        $validator=Validator::make($request->all(),$rules);
+        if($validator->fails())
+            return $this->returnResponse('',$validator->errors()->first(),400);
+
+        $Request_user = Auth::guard('user')->user();
+
+        $user=User::where('id', $Request_user->id)->first();
+        if($Request_user->name == $request->name)
+            return $this->returnResponse('','This is the same name', 400);
+        $result=$user->update([
+            'name'=>$request->name
+        ]);
+        if($result)
+            return $this->returnResponse('','name has been changed', 200);
+
+        return $this->returnResponse('','name has not been changed', 400);
+
+    }
+    public function Get_User(){
+        $Request_user = Auth::guard('user')->user();
+        return $this->returnResponse($Request_user,'ok', 200);
+
+    }
+    public function User_Delete(Request $request)
+    {
+        // $user=User::where('id', $request->id)->delete();
+        // $Wallet_Delete = app(WalletUser::class);
+        // $result_Delete=$Wallet_Delete-> Delete_Wallet($user->id);
+
+        // if($user && $result_Delete)
+        //     return $this->returnResponse('','The user has been deleted', 200);
+
+        // return $this->returnResponse('','The user has been deleted', 200);
+
+    }
 
 }

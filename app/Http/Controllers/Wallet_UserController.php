@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TypePay;
 use App\Models\WalletUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\TraitApiResponse;
 use App\Http\Controllers\TransactionController;
 
@@ -55,6 +56,26 @@ public function create_wallet_user($user_id){
     if(!$result)
         return false;
     return true;
+
+}
+public function Get_Amount()
+{
+    $Request_user = Auth::guard('user')->user();
+    $wallet_user = WalletUser::where('user_id', $Request_user->id)->first();
+    if($wallet_user)
+        return $this->returnResponse($wallet_user->amount,"your amount",200);
+
+    return $this->returnResponse("","Not fount",400);
+
+
+}
+public function Delete_Wallet($user_id)
+{
+    $wallet_user = WalletUser::where('user_id', $user_id)->delete();
+    if($wallet_user)
+        return true;
+
+    return false;
 
 }
 

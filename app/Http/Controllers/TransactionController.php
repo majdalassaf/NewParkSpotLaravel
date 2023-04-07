@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class TransactionController extends Controller
@@ -24,5 +25,14 @@ public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_use
     return false;
 
     return true;
+}
+public function Get_Transaction()
+{
+    $Request_user = Auth::guard('user')->user();
+    $Transaction_user = Transaction::where('walletuser_id', $Request_user->id)->get();
+
+    return $this->returnResponse($Transaction_user,"your Transaction",200);
+
+
 }
 }

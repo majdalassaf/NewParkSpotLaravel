@@ -1,16 +1,19 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\BookController;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\Zone_Controller;
-use App\Http\Controllers\Car_Controller;
-
-
 use App\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BookController;
+use App\Http\Controllers\Car_Controller;
+use App\Http\Controllers\UserController;
+
+
+
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Zone_Controller;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\Wallet_UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,7 +77,11 @@ Route::group([
     Route::post('Create_Car',[Car_Controller::class,'Create_Car']);
     Route::get('Get_Cars_User',[Car_Controller::class,'Get_Cars_User']);
     Route::post('Delete_Car',[Car_Controller::class,'Delete_Car']);
-
+    Route::post('Update_User_Phone',[UserController::class,'Update_User_Phone']);
+    Route::post('Update_User_Name',[UserController::class,'Update_User_Name']);
+    Route::get('Get_User',[UserController::class,'Get_User']);
+    Route::get('Get_Amount',[Wallet_UserController::class,'Get_Amount']);
+    Route::get('Get_Transaction',[TransactionController::class,'Get_Transaction']);
 
 
 
