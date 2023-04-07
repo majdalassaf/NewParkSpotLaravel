@@ -55,13 +55,17 @@ class Car_Controller extends Controller
     public function Delete_Car(Request $request)
     {
         $Request_User = Auth::guard('user')->user();
+        $count_car=Car::where('user_id',$Request_User->id )->count();
+        if($count_car==1)
+        return $this->returnResponse("","You cannot delete the car, you must own at least one car",400);
+
         $cars=Car::where('num_car', $request->num_car)->where('country',$request->country)->where('user_id',$Request_User->id)->first();
 
         if(!$cars)
         return $this->returnResponse("","No fount",404);
 
-        $cars->delete();
-        return $this->returnResponse("","Successfully",201);
+        $car_delete=Car::where('num_car', $request->num_car)->where('country',$request->country)->where('user_id',$Request_User->id)->delete();
+        return $this->returnResponse("","Successfully",200);
     }
 
 }
