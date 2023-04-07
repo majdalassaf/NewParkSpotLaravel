@@ -6,6 +6,8 @@ use App\Models\Car;
 use Illuminate\Http\Request;
 use App\Http\Traits\TraitApiResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
 
 
 class Car_Controller extends Controller
@@ -23,6 +25,16 @@ class Car_Controller extends Controller
     }
     public function Create_Car(Request $request)
     {
+        $rules=[
+            "num_car"=> "required|max:6|min:6",
+            "country"=>  "required",
+            "type"=>  "required",
+            "color"=>  "required",
+        ];
+        $validator=Validator::make($request->all(),$rules);
+        if($validator->fails()){
+            return $this->returnResponse('',$validator->errors()->first(),400);
+            }
         $Request_User = Auth::guard('user')->user();
         $get_car=Car::where('num_car', $request->num_car)->where('country',$request->country)->first();
         if($get_car)
