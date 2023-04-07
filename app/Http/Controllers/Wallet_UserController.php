@@ -47,8 +47,16 @@ public function Check_Amount($hours,$type,$user_id){
     return true;
 }
 
+public function create_wallet_user($user_id){
+    $wallet=new WalletUser;
+    $wallet->amount=0;
+    $wallet->user_id =$user_id;
+    $result=$wallet->save();
+    if(!$result)
+        return false;
+    return true;
 
-
+}
 
 
 }

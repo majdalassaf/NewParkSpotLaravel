@@ -42,6 +42,8 @@ Route::group([
 Route::post('login',[UserController::class,'loginUser']);
 Route::post('register',[UserController::class,'registerUser']);
 Route::post('book',[BookController::class,'create_book']);
+Route::post('Update_User_Password',[UserController::class,'Update_User_Password']);
+
 
 
 });
@@ -72,6 +74,7 @@ Route::group([
     Route::post('Create_Car',[Car_Controller::class,'Create_Car']);
     Route::get('Get_Cars_User',[Car_Controller::class,'Get_Cars_User']);
     Route::post('Delete_Car',[Car_Controller::class,'Delete_Car']);
+
 
 
 
