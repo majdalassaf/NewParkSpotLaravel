@@ -30,7 +30,7 @@ use TraitApiResponse;
         }
         $user=Auth::guard('user')->user();
         $user -> token=$token;
-        return $this->returnResponse($user,"Login Successfuly",200);;
+        return $this->returnResponse($user,"Login Successfully",200);;
     }
 
 
@@ -45,8 +45,8 @@ use TraitApiResponse;
         if($validator->fails())
             return $this->returnResponse('',$validator->errors()->first(),400);
 
-        $userfind=User::where('phone',$request->phone)->first();
-        if ($userfind)
+        $user_find=User::where('phone',$request->phone)->first();
+        if ($user_find)
             return $this->returnResponse("","The number has been registered",400);
 
         $user=new User;
