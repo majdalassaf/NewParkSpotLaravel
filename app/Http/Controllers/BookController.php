@@ -207,6 +207,7 @@ use TraitApiResponse;
 
     public function Extend_ParkingTime(Request $request)
     {
+        $Request_user = Auth::guard('user')->user();
         $walletController = app(Wallet_UserController::class);
         $accept=$walletController-> Check_Amount($request->hours,"extend",$Request_user->id);
         if (!$accept)
@@ -222,7 +223,6 @@ use TraitApiResponse;
         if ( $difEnd_Now >= 21)
             return $this->returnResponse("","You can't extend the time, the work time has expired, you can park for free",401);
 
-        $Request_user = Auth::guard('user')->user();
         $book=Booking::find($request->book_id);
         $new_end_time = Carbon::parse($book->endTime_book);
         $book->endTime_book = $new_end_time->addHour(intval($request->hours));
