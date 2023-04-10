@@ -87,7 +87,7 @@ use TraitApiResponse;
             $SlotController->unlocked($slot);
 
 
-        return $this->returnResponse($newBook,"Successfully Book",200);
+        return $this->returnResponse($newBook,"Successfully Book",201);
         }
 
         $SlotController->slot_is_empty($slot);
@@ -191,10 +191,11 @@ use TraitApiResponse;
             return $this->returnResponse("","You do not have a reservation",400);
 
         $current_time=Carbon::now()->tz('Asia/Damascus');
-        $calc_time = $current_time->diffInMinutes($book->endTime_book);
+        $calc_time = $current_time->diffInSeconds($book->endTime_book);
 
         $slot = Slot::where('id',$book->slot_id)->first();
         $zone = Zone::where('id', $slot->zone_id)->first();
+        $book->park_spot = $slot->num_slot;
         $book->zone_name = $zone->name;
         $book->calc_time=$calc_time;
 
@@ -204,36 +205,44 @@ use TraitApiResponse;
 
 
 
-    public function extend_parkingTime(Request $request,$id)
+    public function Extend_ParkingTime(Request $request)
     {
-       $book=Book::find($id);
-       $carbonDate = Carbon::parse($book->endTime_book);
-       $carbonstartpark=Carbon::parse($book->startTime_book);
-       $book->endTime_book=  $carbonDate->addHour(intval($request->hours));
-       $newhours= $book->hours + $request->hours;
+        $walletController = app(Wallet_UserController::class);
+        $accept=$walletController-> Check_Amount($request->hours,"extend",$Request_user->id);
+        if (!$accept)
+        return $this->returnResponse("","No Amount",400);
 
-      $stuts=$book->update([
-         'endTime_book'=>$carbonDate,
-         'hours'=>$newhours,
-
-      ]);
-      return $stuts;
-    //   if($stuts){
-    //      $newBook=Book::find($id);
-    //      $newBook->message='Add Time [-'.$request->hours.'-] Successfully . . .';
-
-    //      return $newBook;
-    //   }
-      return 'oops..!!, You Can Not Add Time .';
-    }
+        $end_shift=Carbon::now();
+        $start_shift=Carbon::now();
+        $end_shift->setTime(0,00);
+        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
+        $difEnd_Now=$end_shift->diffInHours($time_now);
 
 
-    public function calculate_parkTime($id)
-    {
-       $book=Book::find($id);
-       $current_time=Carbon::now()->tz('Asia/Damascus');
-       $remaining_time = $current_time->diffInminutes( $book->endTime_book);
-       return $remaining_time;
+        if ( $difEnd_Now >= 21)
+            return $this->returnResponse("","You can't extend the time, the work time has expired, you can park for free",401);
+
+        $Request_user = Auth::guard('user')->user();
+        $book=Booking::find($request->book_id);
+        $new_end_time = Carbon::parse($book->endTime_book);
+        $book->endTime_book = $new_end_time->addHour(intval($request->hours));
+        $new_hours = $book->hours + $request->hours;
+
+        $status=$book->update([
+            'endTime_book'=>$new_end_time,
+            'hours'=>$new_hours,
+            'extends'=>true,
+        ]);
+        if(!$status)
+            return $this->returnResponse('',"The extension has not been completed, please try again",400);
+
+        $walletController = app(Wallet_UserController::class);
+        $accept=$walletController-> withdraw($request->hours,"extend",$Request_user->id,$book->id);
+
+        if(!$accept)
+            return $this->returnResponse('',"The extension has not been completed, please try again",400);
+
+        return $this->returnResponse('',"The time has been extended successfully",201);
     }
 
 

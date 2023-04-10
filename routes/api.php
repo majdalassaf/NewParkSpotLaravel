@@ -87,6 +87,8 @@ Route::group([
     Route::get('Get_Transaction',[TransactionController::class,'Get_Transaction']);
 
     Route::post('Get_Book',[BookController::class,'Get_Book']);
+    Route::post('Extend_ParkingTime',[BookController::class,'Extend_ParkingTime']);
+
 
 
 
