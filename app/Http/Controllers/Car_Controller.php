@@ -68,4 +68,15 @@ class Car_Controller extends Controller
         return $this->returnResponse("","Successfully",200);
     }
 
+    public function Check_Car($user_id,$num_car,$country)
+    {
+
+        $check_car=Car::where('num_car', $num_car)->where('country',$country)->where('user_id',$user_id);
+        if($check_car)
+            return true;
+
+        return false;
+
+    }
+
 }

@@ -165,7 +165,7 @@ use TraitApiResponse;
             $SlotController->unlocked($slot);
 
 
-        return $this->returnResponse($newBook,"Successfully Book",200);
+        return $this->returnResponse($newBook,"Successfully Book",201);
         }
 
         $SlotController->slot_is_empty($slot);
@@ -175,91 +175,150 @@ use TraitApiResponse;
     }
 
 
+    // كرمال يصير يجيب الحجز تبع اليوزر
+    public function Get_Book(Request $request)
+    {
+        $Request_user = Auth::guard('user')->user();
 
+        $CarController = app(Car_Controller::class);
+        $check_car=$CarController-> Check_Car($request->num_car,$request->country,$Request_user->id);
 
+        if(!$check_car)
+            return $this->returnResponse("","Verify vehicle ownership",404);
 
+        $book= Booking::where('num_car', $request->num_car)->where('country',$request->country)->first();
+        if(!$book)
+            return $this->returnResponse("","You do not have a reservation",400);
 
+        $current_time=Carbon::now()->tz('Asia/Damascus');
+        $calc_time = $current_time->diffInMinutes($book->endTime_book);
 
-
-
-
-    public function create_book_admin(Request $request){
-
-        $Request_admin = Auth::guard('admin')->user();
-
-        $end_shift=Carbon::now();
-        $start_shift=Carbon::now();
-        $end_shift->setTime(0,00);
-        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
-        $difEnd_Now=$end_shift->diffInHours($time_now);
-
-
-        if ( $difEnd_Now >= 21)
-        return $this->returnResponse("","You can't reserve, it's over, you can park for free",401);
-
-        if ($difEnd_Now < 8 )
-        return $this->returnResponse("","You can't book, the working time hasn't started, the time starts at 08:00 AM ",401);
-
-
-        if(Booking::where('num_car', $request->num_car)->where('country',$request->country)->first())
-        return $this->returnResponse("","The car already has a reservation. You cannot book",400);
-
-
-
-        $SlotController = app(SlotController::class);
-        $slot=$SlotController-> Book_Slot_id($Request_admin->zone_id,$request->slot_id);
-        if (!$slot)
-            return $this->returnResponse("","No Slots Available for This Park",400);
-
-        $book = new Booking();
-        $book->country = $request->country;
-        $book->num_car = $request->num_car;
-        $book->slot_id = $slot->id;
+        $slot = Slot::where('id',$book->slot_id)->first();
         $zone = Zone::where('id', $slot->zone_id)->first();
-        $book->hours = $request->hours;
-        $book->date = Carbon::now()->today()->tz('Asia/Damascus');
-        $book->startTime_book = Carbon::now()->tz('Asia/Damascus');
-        $book->endTime_book = Carbon::now()->tz('Asia/Damascus')->addHour(intval($request->hours));
-        $book->startTime_violation = $end_shift;
+        $book->zone_name = $zone->name;
+        $book->calc_time=$calc_time;
 
-        $result = $book->save();
+        return $this->returnResponse($book,"You have a reservation",201);
 
-
-
-        if ($result) {
-            $newBook = Booking::find($book->id);
-            // $newBook->zonename = $zone->name;
-            $newBook->park_spot = $slot->num_slot;
-            $walletController = app(Wallet_AdminController::class);
-            if($request->merge){
-            $accept=$walletController-> withdraw($request->hours,"merge",$Request_admin->id,$book->id);
-            $book->update([
-                'merge'=>true,
-            ]);
-            $merge_slot= new MergeSlot();
-            $merge_slot->slot_id=$request->slot_merge_id;
-            $merge_slot->booking_id=$newBook->id;
-            $merge_slot->save();
-
-            }
-            else {
-                $accept=$walletController-> withdraw($request->hours,"hourly",$Request_admin->id);
-            }
-            if(!$accept){
-                $SlotController->slot_is_empty($slot);
-                $newBook->delete();
-                return $this->returnResponse("","Error transaction",400);
-            }
-
-
-            $SlotController->unlocked($slot);
-
-
-        return $this->returnResponse($book,"Successfully Book",200);
-        }
-
-        $SlotController->slot_is_empty($slot);
-
-        return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
     }
+
+
+
+    public function extend_parkingTime(Request $request,$id)
+    {
+       $book=Book::find($id);
+       $carbonDate = Carbon::parse($book->endTime_book);
+       $carbonstartpark=Carbon::parse($book->startTime_book);
+       $book->endTime_book=  $carbonDate->addHour(intval($request->hours));
+       $newhours= $book->hours + $request->hours;
+
+      $stuts=$book->update([
+         'endTime_book'=>$carbonDate,
+         'hours'=>$newhours,
+
+      ]);
+      return $stuts;
+    //   if($stuts){
+    //      $newBook=Book::find($id);
+    //      $newBook->message='Add Time [-'.$request->hours.'-] Successfully . . .';
+
+    //      return $newBook;
+    //   }
+      return 'oops..!!, You Can Not Add Time .';
+    }
+
+
+    public function calculate_parkTime($id)
+    {
+       $book=Book::find($id);
+       $current_time=Carbon::now()->tz('Asia/Damascus');
+       $remaining_time = $current_time->diffInminutes( $book->endTime_book);
+       return $remaining_time;
+    }
+
+
+
+
+
+
+
+    // public function create_book_admin(Request $request){
+
+    //     $Request_admin = Auth::guard('admin')->user();
+
+    //     $end_shift=Carbon::now();
+    //     $start_shift=Carbon::now();
+    //     $end_shift->setTime(0,00);
+    //     $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
+    //     $difEnd_Now=$end_shift->diffInHours($time_now);
+
+
+    //     if ( $difEnd_Now >= 21)
+    //     return $this->returnResponse("","You can't reserve, it's over, you can park for free",401);
+
+    //     if ($difEnd_Now < 8 )
+    //     return $this->returnResponse("","You can't book, the working time hasn't started, the time starts at 08:00 AM ",401);
+
+
+    //     if(Booking::where('num_car', $request->num_car)->where('country',$request->country)->first())
+    //     return $this->returnResponse("","The car already has a reservation. You cannot book",400);
+
+
+
+    //     $SlotController = app(SlotController::class);
+    //     $slot=$SlotController-> Book_Slot_id($Request_admin->zone_id,$request->slot_id);
+    //     if (!$slot)
+    //         return $this->returnResponse("","No Slots Available for This Park",400);
+
+    //     $book = new Booking();
+    //     $book->country = $request->country;
+    //     $book->num_car = $request->num_car;
+    //     $book->slot_id = $slot->id;
+    //     $zone = Zone::where('id', $slot->zone_id)->first();
+    //     $book->hours = $request->hours;
+    //     $book->date = Carbon::now()->today()->tz('Asia/Damascus');
+    //     $book->startTime_book = Carbon::now()->tz('Asia/Damascus');
+    //     $book->endTime_book = Carbon::now()->tz('Asia/Damascus')->addHour(intval($request->hours));
+    //     $book->startTime_violation = $end_shift;
+
+    //     $result = $book->save();
+
+
+
+    //     if ($result) {
+    //         $newBook = Booking::find($book->id);
+    //         // $newBook->zonename = $zone->name;
+    //         $newBook->park_spot = $slot->num_slot;
+    //         $walletController = app(Wallet_AdminController::class);
+    //         if($request->merge){
+    //         $accept=$walletController-> withdraw($request->hours,"merge",$Request_admin->id,$book->id);
+    //         $book->update([
+    //             'merge'=>true,
+    //         ]);
+    //         $merge_slot= new MergeSlot();
+    //         $merge_slot->slot_id=$request->slot_merge_id;
+    //         $merge_slot->booking_id=$newBook->id;
+    //         $merge_slot->save();
+
+    //         }
+    //         else {
+    //             $accept=$walletController-> withdraw($request->hours,"hourly",$Request_admin->id);
+    //         }
+    //         if(!$accept){
+    //             $SlotController->slot_is_empty($slot);
+    //             $newBook->delete();
+    //             return $this->returnResponse("","Error transaction",400);
+    //         }
+
+
+    //         $SlotController->unlocked($slot);
+
+
+    //     return $this->returnResponse($book,"Successfully Book",200);
+    //     }
+
+    //     $SlotController->slot_is_empty($slot);
+
+    //     return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
+    // }
 }

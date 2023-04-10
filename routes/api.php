@@ -86,6 +86,9 @@ Route::group([
     Route::get('Get_Amount',[Wallet_UserController::class,'Get_Amount']);
     Route::get('Get_Transaction',[TransactionController::class,'Get_Transaction']);
 
+    Route::post('Get_Book',[BookController::class,'Get_Book']);
+
+
 
 
 
