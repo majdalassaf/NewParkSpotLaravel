@@ -199,7 +199,7 @@ use TraitApiResponse;
         $book->zone_name = $zone->name;
         $book->calc_time=$calc_time;
 
-        return $this->returnResponse($book,"You have a reservation",201);
+        return $this->returnResponse($book,"You have a reservation",200);
 
     }
 
@@ -242,7 +242,7 @@ use TraitApiResponse;
         if(!$accept)
             return $this->returnResponse('',"The extension has not been completed, please try again",400);
 
-        return $this->returnResponse('',"The time has been extended successfully",201);
+        return $this->returnResponse('',"The time has been extended successfully",200);
     }
 
 
