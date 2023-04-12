@@ -88,6 +88,8 @@ Route::group([
 
     Route::post('Get_Book',[BookController::class,'Get_Book']);
     Route::post('Extend_ParkingTime',[BookController::class,'Extend_ParkingTime']);
+    Route::post('End_Booking',[BookController::class,'End_Booking']);
+
 
 
 

@@ -245,6 +245,23 @@ use TraitApiResponse;
         return $this->returnResponse('',"The time has been extended successfully",200);
     }
 
+    public function End_Booking(Request $request)
+    {
+        $book= Booking::where('id', $request->book_id)->first();
+        if(!$book)
+            return $this->returnResponse('',"Your reservation has already expired",400);
+
+        $status=$book->update([
+            'expired'=>true,
+        ]);
+        $SlotController = app(SlotController::class);
+        $slot=$SlotController-> slot_is_empty_id($book->slot_id);
+        if($slot)
+            return $this->returnResponse('',"Your reservation has been completed.",200);
+
+            return $this->returnResponse('',"Try again, thanks",400);
+
+    }
 
 
 

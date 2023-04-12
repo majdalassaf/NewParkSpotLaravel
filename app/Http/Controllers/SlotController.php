@@ -50,10 +50,25 @@ class SlotController extends Controller
     }
     public function slot_is_empty($slot){
 
+
+
         $slot->update([
             'status' =>false,
-            'is_locked' => false
+            'is_locked' => false,
         ]);
+
+    }
+    public function slot_is_empty_id($slot_id){
+
+
+        $slot = Slot::where('id', $slot_id)->first();
+        $slot->update([
+            'status' =>false,
+            'is_locked' => false,
+        ]);
+        if($slot)
+            return true;
+        return false;
 
     }
 
