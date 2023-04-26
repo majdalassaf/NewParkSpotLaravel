@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use App\Models\WalletUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,7 +30,9 @@ public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_use
 public function Get_Transaction()
 {
     $Request_user = Auth::guard('user')->user();
-    $Transaction_user = Transaction::where('walletuser_id', $Request_user->id)->get();
+
+    $wallet_user=WalletUser::where('user_id', $Request_user->id)->first();
+    $Transaction_user = Transaction::where('walletuser_id', $wallet_user->id)->get();
 
     return $this->returnResponse($Transaction_user,"your Transaction",200);
 

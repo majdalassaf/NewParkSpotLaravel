@@ -58,7 +58,7 @@ Route::group([
 
     ],function (){
     Route::get('check',[AdminController::class,'index']);
-    Route::post('create_book_admin',[BookController::class,'create_book_admin']);
+    Route::post('create_outside_admin',[BookController::class,'create_outside_admin']);
     Route::get('Get_All_Slot',[SlotController::class,'Get_All_Slot']);
 
 

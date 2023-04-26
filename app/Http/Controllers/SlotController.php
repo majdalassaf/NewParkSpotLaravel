@@ -33,6 +33,19 @@ class SlotController extends Controller
         $this->locked($slot);
         return $slot;
     }
+    public function Book_Slot_name($zone_id,$slot_name){
+
+        $slot = Slot::where('status', false)
+        ->where('is_locked', false)
+        ->where('zone_id',$zone_id)
+        ->where('num_slot',$slot_name)
+        ->lockForUpdate()
+        ->first();
+        if (!$slot)
+            return false;
+        $this->locked($slot);
+        return $slot;
+    }
 
     public function locked($slot){
 
@@ -49,8 +62,6 @@ class SlotController extends Controller
 
     }
     public function slot_is_empty($slot){
-
-
 
         $slot->update([
             'status' =>false,

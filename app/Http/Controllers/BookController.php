@@ -257,8 +257,7 @@ use TraitApiResponse;
 
 
 
-    public function create_book_admin(Request $request){
-
+    public function create_outside_admin(Request $request){
 
         $Request_admin = Auth::guard('admin')->user();
 
@@ -286,54 +285,56 @@ use TraitApiResponse;
         if (!$slot)
             return $this->returnResponse("","No Slots Available for This Park",400);
 
+        if($request->merge){
+        $slot_merge=$SlotController->Book_Slot_name($Request_admin->zone_id,$request->slot_name);
+            if(!$slot_merge){
+                $slot_empty=$SlotController->slot_is_empty($slot);
+                return $this->returnResponse("","No Slots merge Available for This Park",400);
+                }
+        }
+
+
         $book = new Booking();
         $book->country = $request->country;
         $book->num_car = $request->num_car;
         $book->slot_id = $slot->id;
-        $zone = Zone::where('id', $slot->zone_id)->first();
         $book->hours = $request->hours;
         $book->date = Carbon::now()->today()->tz('Asia/Damascus');
         $book->startTime_book = Carbon::now()->tz('Asia/Damascus');
         $book->endTime_book = Carbon::now()->tz('Asia/Damascus')->addHour(intval($request->hours));
         $book->startTime_violation = $end_shift;
-
+        $book->merge=$request->merge;
         $result = $book->save();
 
-
-
         if ($result) {
-            $newBook = Booking::find($book->id);
-            // $newBook->zonename = $zone->name;
-            $newBook->park_spot = $slot->num_slot;
             $walletController = app(Wallet_AdminController::class);
             if($request->merge){
-            $accept=$walletController-> withdraw($request->hours,"merge",$Request_admin->id,$book->id);
-            $book->update([
-                'merge'=>true,
-            ]);
-            $merge_slot= new MergeSlot();
-            $merge_slot->slot_id=$request->slot_merge_id;
-            $merge_slot->booking_id=$newBook->id;
-            $merge_slot->save();
-
+                $accept=$walletController-> withdraw($request->hours,"merge",$Request_admin->id,$book->id);
+                $merge_slot= new MergeSlot();
+                $merge_slot->slot_id=$slot_merge->id;
+                $merge_slot->booking_id=$book->id;
+                $merge_slot->save();
             }
             else {
-                $accept=$walletController-> withdraw($request->hours,"hourly",$Request_admin->id);
+                $accept=$walletController-> withdraw($request->hours,"hourly",$Request_admin->id,$book->id);
             }
             if(!$accept){
                 $SlotController->slot_is_empty($slot);
-                $newBook->delete();
+                if($request->merge)
+                    $SlotController->slot_is_empty($slot_merge);
+                $book->delete();
                 return $this->returnResponse("","Error transaction",400);
             }
-
-
             $SlotController->unlocked($slot);
+            if($request->merge)
+                $SlotController->unlocked($slot_merge);
 
-
-        return $this->returnResponse($book,"Successfully Book",200);
+            return $this->returnResponse('',"Successfully Book",201);
         }
 
         $SlotController->slot_is_empty($slot);
+        $SlotController->slot_is_empty($slot_merge);
+
 
         return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
     }
