@@ -242,9 +242,7 @@ use TraitApiResponse;
         if(!$book)
             return $this->returnResponse('',"Your reservation has already expired",400);
 
-        $status=$book->update([
-            'expired'=>true,
-        ]);
+        $status=$book->delete();
         $SlotController = app(SlotController::class);
         $slot=$SlotController-> slot_is_empty_id($book->slot_id);
         if($slot)
@@ -260,6 +258,7 @@ use TraitApiResponse;
 
 
     public function create_book_admin(Request $request){
+
 
         $Request_admin = Auth::guard('admin')->user();
 
