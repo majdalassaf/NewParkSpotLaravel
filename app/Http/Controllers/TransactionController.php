@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_user_id=null,$Wallet_admin_id=null)
+public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_user_id=null)
 {
 
     $transaction = new Transaction();
@@ -18,10 +18,27 @@ public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_use
     $transaction->typepay_id =$Type_pay_id ;
     $transaction->cost =$total_cost ;
     $transaction->walletuser_id =$Wallet_user_id ;
+
+
+    $result = $transaction->save();
+    if(!$result)
+    return false;
+
+    return true;
+}
+public function Create_Transaction_admin($book_id,$Type_pay_id,$total_cost,$Wallet_admin_id=null)
+{
+
+    $transaction = new Transaction();
+    $transaction->book_id =$book_id ;
+    $transaction->typepay_id =$Type_pay_id ;
+    $transaction->cost =$total_cost ;
     $transaction->walletadmin_id =$Wallet_admin_id ;
 
 
     $result = $transaction->save();
+    return $transaction;
+
     if(!$result)
     return false;
 

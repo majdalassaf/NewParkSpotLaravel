@@ -35,6 +35,8 @@ Route::group([
     'prefix'=>'/admin'
     ],function (){
 Route::post('login',[AdminController::class,'loginAdmin']);
+Route::post('register',[AdminController::class,'registerAdmin']);
+
 
 
 });

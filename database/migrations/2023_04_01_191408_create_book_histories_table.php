@@ -16,8 +16,7 @@ class CreateBookHistoriesTable extends Migration
         Schema::create('book_histories', function (Blueprint $table) {
             $table->id();
             $table->string('country');
-            $table->integer('num_car')->unsigned();
-            $table->foreign(['country', 'num_car'])->references(['country', 'num_car'])->on('cars')->onDelete('cascade');
+            $table->string('num_car');
             $table->integer('slot_id');
             $table->date('date');
             $table->integer("hours")->unsigned();

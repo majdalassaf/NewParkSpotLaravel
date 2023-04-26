@@ -16,7 +16,7 @@ class CreateBookingsTable extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->string('country');
-            $table->integer('num_car')->unsigned();
+            $table->string('num_car');
             $table->unique(['country', 'num_car']);
             $table->integer('slot_id');
             $table->date('date');
