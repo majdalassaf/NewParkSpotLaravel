@@ -68,10 +68,14 @@ use TraitApiResponse;
     }
     public function slot_is_empty($slot){
 
-        $slot->update([
+        $status=$slot->update([
             'status' =>false,
             'is_locked' => false,
         ]);
+        if($status)
+            return true;
+
+        return false;
 
     }
     public function slot_is_empty_id($slot_id){

@@ -80,7 +80,8 @@ Route::group([
 
     Route::get('Get_All_Slot',[SlotController::class,'Get_All_Slot']);
     Route::post('End_Booking',[BookController::class,'End_Booking']);
-    Route::post('End_Booking_violation',[BookController::class,'End_Booking_violation']);
+    Route::post('End_Booking_All',[BookController::class,'End_Booking_All']);
+
 
 
 

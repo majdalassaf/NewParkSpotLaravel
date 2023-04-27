@@ -90,8 +90,6 @@ use TraitApiResponse;
 
     }
 
-
-
     public function create_book_user_now(Request $request){
 
         $Request_user = Auth::guard('user')->user();
@@ -166,7 +164,6 @@ use TraitApiResponse;
     }
 
 
-    // كرمال يصير يجيب الحجز تبع اليوزر
     public function Get_Book(Request $request)
     {
         $Request_user = Auth::guard('user')->user();
@@ -259,7 +256,7 @@ use TraitApiResponse;
         $end_shift=Carbon::now();
         $start_shift=Carbon::now();
         $end_shift->setTime(0,00);
-        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
+        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(18);
         $difEnd_Now=$end_shift->diffInHours($time_now);
 
 
@@ -304,11 +301,14 @@ use TraitApiResponse;
         if ($result) {
             $walletController = app(Wallet_AdminController::class);
             if($request->merge){
-                $accept=$walletController-> withdraw($request->hours,"merge",$Request_admin->id,$book->id);
-                $merge_slot= new MergeSlot();
-                $merge_slot->slot_id=$slot_merge->id;
-                $merge_slot->booking_id=$book->id;
-                $merge_slot->save();
+                $Merge_Slot_Controller = app(Merge_Slot_Controller::class);
+                $accept=$Merge_Slot_Controller-> create_merge_slot($slot_merge->id,$book->id);
+                if(!$accept){
+                    $slot_empty=$SlotController->slot_is_empty($slot);
+                    $slot_empty=$SlotController->slot_is_empty($slot_merge);
+                    return $this->returnResponse("","try again",400);
+                }
+            $accept=$walletController-> withdraw($request->hours,"merge",$Request_admin->id,$book->id);
             }
             else {
                 $accept=$walletController-> withdraw($request->hours,"hourly",$Request_admin->id,$book->id);
@@ -388,32 +388,44 @@ use TraitApiResponse;
     }
 
 
-    public function End_Booking_violation(Request $request){
+    public function End_Booking_All(Request $request)
+    {
         $Request_admin = Auth::guard('admin')->user();
+
+        $Merge_Slot_Controller = app(Merge_Slot_Controller::class);
         $SlotController = app(SlotController::class);
+
 
         $book= Booking::where('id', $request->book_id)->first();
         if(!$book)
             return $this->returnResponse('',"Your reservation has already expired",400);
 
+        if($book->merge){
+            $slot_merge=$Merge_Slot_Controller-> get_merge_slot($book->id);
+            $SlotController->slot_is_empty_id($slot_merge);
+            $status=$Merge_Slot_Controller-> delete_merge_slot($book->id);
+            if(!$status)
+                return $this->returnResponse('',"Try again, thanks",400);
+        }
+        if($book->violation){
+            $endTime_book=Carbon::now()->tz('Asia/Damascus');
+            $hours = $endTime_book->diffInHours($book->startTime_book);
+            $hours += 1;
 
-        $endTime_book=Carbon::now()->tz('Asia/Damascus');
-        $hours = $endTime_book->diffInHours($book->startTime_book);
-        $hours += 1;
+            $status=$book->update([
+                'endTime_book'=>$endTime_book,
+                'hours'=>$hours,
 
-        $status=$book->update([
-            'endTime_book'=>$endTime_book,
-            'hours'=>$hours,
+            ]);
+            if(!$status)
+                return $this->returnResponse('',"Try again, thanks",400);
 
-        ]);
-        if(!$status)
-            return $this->returnResponse('',"Try again, thanks",400);
+            $walletController = app(Wallet_AdminController::class);
+            $accept=$walletController-> withdraw($hours,"violation",$Request_admin->id,$book->id);
 
-        $walletController = app(Wallet_AdminController::class);
-        $accept=$walletController-> withdraw($hours,"violation",$Request_admin->id,$book->id);
-
-        if(!$accept){
-            return $this->returnResponse("","Error transaction",400);
+            if(!$accept){
+                return $this->returnResponse("","Error transaction",400);
+            }
         }
 
         $status=$book->delete();
@@ -421,7 +433,7 @@ use TraitApiResponse;
         if($slot)
             return $this->returnResponse('',"Your reservation has been completed.",200);
 
-        return $this->returnResponse('',"Try again, thanks",400);
+            return $this->returnResponse('',"Try again, thanks",400);
 
     }
 }
