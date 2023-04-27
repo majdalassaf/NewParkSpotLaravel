@@ -32,6 +32,21 @@ use App\Http\Controllers\Wallet_UserController;
 // });
 Route::group([
     'middleware'=>['ApiKey'],
+    'prefix'=>'/accountable'
+    ],function (){
+Route::post('Add_Zone',[Zone_Controller::class,'Add_Zone']);
+Route::post('Delete_Zone',[Zone_Controller::class,'Delete_Zone']);
+Route::post('Add_Slots',[SlotController::class,'Add_Slots']);
+Route::post('Delete_Slot',[SlotController::class,'Delete_Slot']);
+
+
+
+
+
+
+});
+Route::group([
+    'middleware'=>['ApiKey'],
     'prefix'=>'/admin'
     ],function (){
 Route::post('login',[AdminController::class,'loginAdmin']);

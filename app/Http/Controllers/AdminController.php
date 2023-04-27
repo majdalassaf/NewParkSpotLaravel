@@ -56,8 +56,8 @@ public function registerAdmin(Request $request) {
     if($validator->fails())
         return $this->returnResponse('',$validator->errors()->first(),400);
 
-    $user_find=Admin::where('phone',$request->phone)->first();
-    if ($user_find)
+    $admin_find=Admin::where('phone',$request->phone)->first();
+    if ($admin_find)
         return $this->returnResponse("","The number has been registered",400);
 
     $admin=new Admin;
