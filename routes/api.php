@@ -76,6 +76,8 @@ Route::group([
     ],function (){
     Route::get('check',[AdminController::class,'index']);
     Route::post('create_outside_admin',[BookController::class,'create_outside_admin']);
+    Route::post('create_violation_admin',[BookController::class,'create_violation_admin']);
+
     Route::get('Get_All_Slot',[SlotController::class,'Get_All_Slot']);
 
 
