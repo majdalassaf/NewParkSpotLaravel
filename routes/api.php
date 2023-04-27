@@ -79,6 +79,9 @@ Route::group([
     Route::post('create_violation_admin',[BookController::class,'create_violation_admin']);
 
     Route::get('Get_All_Slot',[SlotController::class,'Get_All_Slot']);
+    Route::post('End_Booking',[BookController::class,'End_Booking']);
+    Route::post('End_Booking_violation',[BookController::class,'End_Booking_violation']);
+
 
 
 

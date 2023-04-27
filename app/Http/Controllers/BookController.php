@@ -388,19 +388,40 @@ use TraitApiResponse;
     }
 
 
-    public function End_Booking_admin(Request $request)
-    {
+    public function End_Booking_violation(Request $request){
+        $Request_admin = Auth::guard('admin')->user();
+        $SlotController = app(SlotController::class);
+
         $book= Booking::where('id', $request->book_id)->first();
         if(!$book)
             return $this->returnResponse('',"Your reservation has already expired",400);
 
+
+        $endTime_book=Carbon::now()->tz('Asia/Damascus');
+        $hours = $endTime_book->diffInHours($book->startTime_book);
+        $hours += 1;
+
+        $status=$book->update([
+            'endTime_book'=>$endTime_book,
+            'hours'=>$hours,
+
+        ]);
+        if(!$status)
+            return $this->returnResponse('',"Try again, thanks",400);
+
+        $walletController = app(Wallet_AdminController::class);
+        $accept=$walletController-> withdraw($hours,"violation",$Request_admin->id,$book->id);
+
+        if(!$accept){
+            return $this->returnResponse("","Error transaction",400);
+        }
+
         $status=$book->delete();
-        $SlotController = app(SlotController::class);
         $slot=$SlotController-> slot_is_empty_id($book->slot_id);
         if($slot)
             return $this->returnResponse('',"Your reservation has been completed.",200);
 
-            return $this->returnResponse('',"Try again, thanks",400);
+        return $this->returnResponse('',"Try again, thanks",400);
 
     }
 }
