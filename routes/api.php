@@ -15,6 +15,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Zone_Controller;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Wallet_UserController;
+use App\Http\Controllers\Wallet_AdminController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +83,9 @@ Route::group([
     Route::get('Get_All_Slot',[SlotController::class,'Get_All_Slot']);
     Route::post('End_Booking',[BookController::class,'End_Booking']);
     Route::post('End_Booking_All',[BookController::class,'End_Booking_All']);
+    Route::post('Deposit',[Wallet_AdminController::class,'Deposit']);
+
+
 
 
 

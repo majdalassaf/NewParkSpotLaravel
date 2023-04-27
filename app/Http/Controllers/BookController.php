@@ -240,6 +240,9 @@ use TraitApiResponse;
             return $this->returnResponse('',"Your reservation has already expired",400);
 
         $status=$book->delete();
+        if(!$status)
+            return $this->returnResponse('',"Try again, thanks",400);
+
         $SlotController = app(SlotController::class);
         $slot=$SlotController-> slot_is_empty_id($book->slot_id);
         if($slot)
@@ -429,11 +432,20 @@ use TraitApiResponse;
         }
 
         $status=$book->delete();
+        if(!$status)
+            return $this->returnResponse('',"Try again, thanks",400);
+
         $slot=$SlotController-> slot_is_empty_id($book->slot_id);
         if($slot)
             return $this->returnResponse('',"Your reservation has been completed.",200);
 
-            return $this->returnResponse('',"Try again, thanks",400);
+        return $this->returnResponse('',"Try again, thanks",400);
 
     }
+
+    public function update_booking_merge(Request $request){
+
+
+    }
+
 }

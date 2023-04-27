@@ -10,49 +10,49 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_user_id=null)
-{
+    public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$Wallet_user_id=null)
+    {
 
-    $transaction = new Transaction();
-    $transaction->book_id =$book_id ;
-    $transaction->typepay_id =$Type_pay_id ;
-    $transaction->cost =$total_cost ;
-    $transaction->walletuser_id =$Wallet_user_id ;
-
-
-    $result = $transaction->save();
-    if(!$result)
-    return false;
-
-    return true;
-}
-public function Create_Transaction_admin($book_id,$Type_pay_id,$total_cost,$Wallet_admin_id=null)
-{
-
-    $transaction = new Transaction();
-    $transaction->book_id =$book_id ;
-    $transaction->typepay_id =$Type_pay_id ;
-    $transaction->cost =$total_cost ;
-    $transaction->walletadmin_id =$Wallet_admin_id ;
+        $transaction = new Transaction();
+        $transaction->book_id =$book_id ;
+        $transaction->typepay_id =$Type_pay_id ;
+        $transaction->cost =$total_cost ;
+        $transaction->walletuser_id =$Wallet_user_id ;
 
 
-    $result = $transaction->save();
-    return $transaction;
+        $result = $transaction->save();
+        if(!$result)
+            return false;
 
-    if(!$result)
-    return false;
+        return true;
+    }
+    public function Create_Transaction_admin($book_id,$Type_pay_id,$total_cost,$Wallet_admin_id=null)
+    {
 
-    return true;
-}
-public function Get_Transaction()
-{
-    $Request_user = Auth::guard('user')->user();
-
-    $wallet_user=WalletUser::where('user_id', $Request_user->id)->first();
-    $Transaction_user = Transaction::where('walletuser_id', $wallet_user->id)->get();
-
-    return $this->returnResponse($Transaction_user,"your Transaction",200);
+        $transaction = new Transaction();
+        $transaction->book_id =$book_id ;
+        $transaction->typepay_id =$Type_pay_id ;
+        $transaction->cost =$total_cost ;
+        $transaction->walletadmin_id =$Wallet_admin_id ;
 
 
-}
+        $result = $transaction->save();
+        return $transaction;
+
+        if(!$result)
+            return false;
+
+        return true;
+    }
+    public function Get_Transaction()
+    {
+        $Request_user = Auth::guard('user')->user();
+
+        $wallet_user=WalletUser::where('user_id', $Request_user->id)->first();
+        $Transaction_user = Transaction::where('walletuser_id', $wallet_user->id)->get();
+
+        return $this->returnResponse($Transaction_user,"your Transaction",200);
+
+
+    }
 }
