@@ -422,6 +422,7 @@ use TraitApiResponse;
         if($request->merge){
             $Merge_Slot_Controller = app(Merge_Slot_Controller::class);
             $accept=$Merge_Slot_Controller-> create_merge_slot($slot_merge->id,$book->id);
+            $SlotController->unlocked($slot_merge);
             if(!$accept){
                 $slot_empty=$SlotController->slot_is_empty($slot);
                 $slot_empty=$SlotController->slot_is_empty($slot_merge);
