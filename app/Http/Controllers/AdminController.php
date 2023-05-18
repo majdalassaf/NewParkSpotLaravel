@@ -33,7 +33,7 @@ public function loginAdmin(Request $request)
 
     $admin=Auth::guard('admin')->user();
     $admin -> token=$token;
-    return $this->returnResponse($admin,"Login Successfuly",200);;
+    return $this->returnResponse($admin,"Login Successfully",200);;
     }
 
 

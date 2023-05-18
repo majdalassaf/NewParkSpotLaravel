@@ -17,6 +17,7 @@ use App\Http\Traits\TraitApiResponse;
 use App\Http\Controllers\SlotController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Wallet_UserController;
+use App\Models\TypePay;
 
 class BookController extends Controller{
 use TraitApiResponse;
@@ -373,7 +374,7 @@ use TraitApiResponse;
         $end_shift=Carbon::now();
         $start_shift=Carbon::now();
         $end_shift->setTime(0,00);
-        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->addHours(10);
+        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(5);
         $difEnd_Now=$end_shift->diffInHours($time_now);
 
 
@@ -394,6 +395,13 @@ use TraitApiResponse;
         if (!$slot)
             return $this->returnResponse("","No Slots Available for This Park",400);
 
+        if($request->merge){
+            $slot_merge=$SlotController->Book_Slot_name($Request_admin->zone_id,$request->slot_name);
+                if(!$slot_merge){
+                    $slot_empty=$SlotController->slot_is_empty($slot);
+                    return $this->returnResponse("","No Slots merge Available for This Park",400);
+                    }
+                }
 
 
         $book = new Booking();
@@ -406,11 +414,21 @@ use TraitApiResponse;
         $book->endTime_book = $end_shift;
         $book->startTime_violation = Carbon::now()->tz('Asia/Damascus');
         $book->violation =true;
+        $book->merge=$request->merge;
         $result = $book->save();
 
         if ($result) {
             $SlotController->unlocked($slot);
-            return $this->returnResponse('',"Successfully Book",201);
+        if($request->merge){
+            $Merge_Slot_Controller = app(Merge_Slot_Controller::class);
+            $accept=$Merge_Slot_Controller-> create_merge_slot($slot_merge->id,$book->id);
+            if(!$accept){
+                $slot_empty=$SlotController->slot_is_empty($slot);
+                $slot_empty=$SlotController->slot_is_empty($slot_merge);
+                return $this->returnResponse("","try again",400);
+            }
+        }
+        return $this->returnResponse('',"Successfully Book",201);
         }
 
         $SlotController->slot_is_empty($slot);
@@ -474,4 +492,11 @@ use TraitApiResponse;
     {
     }
 
+    public function type_cost()
+    {
+
+        $type = TypePay::all();
+        return $this->returnResponse($type,"Successfully",200);
+
+    }
 }

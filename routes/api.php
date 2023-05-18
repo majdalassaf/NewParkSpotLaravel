@@ -87,6 +87,7 @@ Route::group([
     Route::post('Deposit',[Wallet_AdminController::class,'Deposit']);
 
     Route::post('Get_Book_slot',[BookController::class,'Get_Book_slot']);
+    Route::get('type_cost',[BookController::class,'type_cost']);
 
 
 
@@ -117,6 +118,8 @@ Route::group([
     Route::post('Get_Book',[BookController::class,'Get_Book']);
     Route::post('Extend_ParkingTime',[BookController::class,'Extend_ParkingTime']);
     Route::post('End_Booking',[BookController::class,'End_Booking']);
+    Route::get('type_cost',[BookController::class,'type_cost']);
+
 
 
 
