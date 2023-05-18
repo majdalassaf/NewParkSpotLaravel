@@ -105,8 +105,8 @@ use TraitApiResponse;
                 }
             }
             else{
-                $i->country='---';
-                $i->num_car='---';
+                $i->country=null;
+                $i->num_car=null;
             }
         }
         if($slot_admin)
