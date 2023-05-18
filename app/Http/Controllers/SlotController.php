@@ -6,6 +6,7 @@ use App\Models\Slot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\TraitApiResponse;
+use App\Models\Booking;
 use App\Models\Zone;
 use Illuminate\Support\Facades\Validator;
 
@@ -94,7 +95,20 @@ use TraitApiResponse;
     {
         $Request_admin = Auth::guard('admin')->user();
 
-        $slot_admin = Slot::where('Zone_id', $Request_admin->zone_id)->get();
+        $slot_admin = Slot::where('zone_id', $Request_admin->zone_id)->get();
+        foreach($slot_admin as $i){
+            if($i->status==1){
+                $slot_status = Booking::where('slot_id', $i->id)->first();
+                if($slot_status){
+                    $i->country=$slot_status->country;
+                    $i->num_car=$slot_status->num_car;
+                }
+            }
+            else{
+                $i->country='---';
+                $i->num_car='---';
+            }
+        }
         if($slot_admin)
             return $this->returnResponse($slot_admin,"All Slot",200);
 
