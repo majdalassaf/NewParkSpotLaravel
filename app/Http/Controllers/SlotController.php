@@ -15,7 +15,8 @@ class SlotController extends Controller
 {
 use TraitApiResponse;
 
-    public function Auto_Slot_id($zone_id){
+    public function Auto_Slot_id($zone_id)
+    {
 
         $slot = Slot::where('status', false)
         ->where('is_locked', false)
@@ -27,7 +28,8 @@ use TraitApiResponse;
         $this->locked($slot);
         return $slot;
     }
-    public function Book_Slot_id($zone_id,$slot_id){
+    public function Book_Slot_id($zone_id,$slot_id)
+    {
 
         $slot = Slot::where('status', false)
         ->where('is_locked', false)
@@ -40,7 +42,8 @@ use TraitApiResponse;
         $this->locked($slot);
         return $slot;
     }
-    public function Book_Slot_name($zone_id,$slot_name){
+    public function Book_Slot_name($zone_id,$slot_name)
+    {
 
         $slot = Slot::where('status', false)
         ->where('is_locked', false)
@@ -54,21 +57,24 @@ use TraitApiResponse;
         return $slot;
     }
 
-    public function locked($slot){
+    public function locked($slot)
+    {
 
         $slot->update([
             'status' =>true,
             'is_locked' => true
         ]);
     }
-    public function unlocked($slot){
+    public function unlocked($slot)
+    {
 
         $slot->update([
             'is_locked' => false
         ]);
 
     }
-    public function slot_is_empty($slot){
+    public function slot_is_empty($slot)
+    {
 
         $status=$slot->update([
             'status' =>false,
@@ -80,7 +86,8 @@ use TraitApiResponse;
         return false;
 
     }
-    public function slot_is_empty_id($slot_id){
+    public function slot_is_empty_id($slot_id)
+    {
         $slot = Slot::where('id', $slot_id)->first();
         $slot->update([
             'status' =>false,
@@ -123,17 +130,36 @@ use TraitApiResponse;
 
     }
 
+    public function Add_Slot(Request $request)
+    {
+        $rules=[
+            "num_slot"=> "required",
+            "zone_id"=> "required",
+        ];
+        $validator=Validator::make($request->all(),$rules);
+        if($validator->fails())
+            return $this->returnResponse('',$validator->errors()->first(),400);
+        $zone=Zone::where('id',$request->zone_id)->first();
+        if(!$zone)
+            return $this->returnResponse('',"oops..!!, The zone does not exist",400);
+        $slot=new Slot;
+        $slot->num_slot=$request->num_slot;
+        $slot->status =0;
+        $slot->zone_id=$request->zone_id;
+        $slot->is_locked=0;
+        $result=$slot->save();
+        if($result)
+            return $this->returnResponse('',"Successfully Add Slots",201);
 
+        return $this->returnResponse('',"oops..!!, You Can Not Add Zone.",400);
+    }
 
-
-    public function Add_Slots(Request $request){
-
+    public function Add_Slots(Request $request)
+    {
         $rules=[
             "num_slot"=> "required",
             "number"=> "required",
             "zone_id"=> "required",
-
-
         ];
         $validator=Validator::make($request->all(),$rules);
         if($validator->fails())
@@ -143,40 +169,32 @@ use TraitApiResponse;
         if(!$zone)
         return $this->returnResponse('',"oops..!!, The zone does not exist",400);
 
-
-
         for ($i = 0; $i < $request->number; $i++){
-
             $slot=new Slot;
             $slot->num_slot=($request->num_slot.$i);
             $slot->status =0;
             $slot->zone_id=$request->zone_id;
             $slot->is_locked=0;
             $result=$slot->save();
-
         }
-
         if($result)
             return $this->returnResponse('',"Successfully Add Slots",201);
 
         return $this->returnResponse('',"oops..!!, You Can Not Add Zone.",400);
+    }
 
 
-}
-public function Delete_Slot(Request $request){
-    $slot=Slot::where('num_slot',$request->num_slot)->where('zone_id',$request->zone_id)->first();
-    if(!$slot)
-    return $this->returnResponse('',"does not already exist",400);
-    $status=$slot->delete();
+    public function Delete_Slot(Request $request)
+    {
+        $slot=Slot::where('num_slot',$request->num_slot)->where('zone_id',$request->zone_id)->first();
+        if(!$slot)
+            return $this->returnResponse('',"does not already exist",400);
+        $status=$slot->delete();
+        if(!$status)
+            return $this->returnResponse('',"oops..!!, You Can Not Delete.",400);
 
-    if(!$status)
-        return $this->returnResponse('',"oops..!!, You Can Not Delete.",400);
+        return $this->returnResponse('',"Successfully Delete Slot",200);
 
-    return $this->returnResponse('',"Successfully Delete Slot",200);
-
-
-
-
-}
+    }
 
 }

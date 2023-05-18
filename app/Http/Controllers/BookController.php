@@ -91,36 +91,33 @@ use TraitApiResponse;
 
     }
 
-    public function create_book_user_now(Request $request){
-
+    public function create_book_user_now(Request $request)
+    {
         $Request_user = Auth::guard('user')->user();
-
         $end_shift=Carbon::now();
         $start_shift=Carbon::now();
         $end_shift->setTime(0,00);
         $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
         $difEnd_Now=$end_shift->diffInHours($time_now);
 
-
         if ( $difEnd_Now >= 21)
-        return $this->returnResponse("","You can't reserve, it's over, you can park for free",401);
+            return $this->returnResponse("","You can't reserve, it's over, you can park for free",401);
 
         if ($difEnd_Now < 8 )
-        return $this->returnResponse("","You can't book, the working time hasn't started, the time starts at 08:00 AM ",401);
+            return $this->returnResponse("","You can't book, the working time hasn't started, the time starts at 08:00 AM ",401);
 
         $car_user = Car::where('num_car', $request->num_car)->where('country',$request->country)->first();
         if(!$car_user)
-        return $this->returnResponse("","Your car is not found",404);
+            return $this->returnResponse("","Your car is not found",404);
 
         if(Booking::where('num_car', $request->num_car)->where('country',$request->country)->first())
-        return $this->returnResponse("","You already have a reservation. You cannot book",400);
+            return $this->returnResponse("","You already have a reservation. You cannot book",400);
 
         $walletController = app(Wallet_UserController::class);
         $accept=$walletController-> Check_Amount($request->hours,"preivous",$Request_user->id);
 
         if (!$accept)
-        return $this->returnResponse("","No Amount",400);
-
+            return $this->returnResponse("","No Amount",400);
 
         $SlotController = app(SlotController::class);
         $slot=$SlotController-> Book_Slot_id($request->zone_id,$request->slot_id);
@@ -139,8 +136,6 @@ use TraitApiResponse;
         $book->startTime_violation = $end_shift;
         $result = $book->save();
 
-
-
         if ($result) {
             $walletController = app(Wallet_UserController::class);
             $accept=$walletController-> withdraw($request->hours,"hourly",$Request_user->id,$book->id);
@@ -150,20 +145,12 @@ use TraitApiResponse;
                 $book->delete();
                 return $this->returnResponse("","Error transaction",400);
             }
-
-
             $SlotController->unlocked($slot);
-
-
-        return $this->returnResponse('',"Successfully Book",201);
+            return $this->returnResponse('',"Successfully Book",201);
         }
-
         $SlotController->slot_is_empty($slot);
-
         return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
-
     }
-
 
     public function Get_Book(Request $request)
     {
@@ -191,6 +178,7 @@ use TraitApiResponse;
         return $this->returnResponse($book,"You have a reservation",200);
 
     }
+
     public function Get_Book_slot(Request $request)
     {
         $Request_admin = Auth::guard('user')->user();
@@ -232,8 +220,6 @@ use TraitApiResponse;
         return $this->returnResponse($book,"ok",200);
 
     }
-
-
 
     public function Extend_ParkingTime(Request $request)
     {
@@ -294,7 +280,8 @@ use TraitApiResponse;
 
     }
 
-    public function create_outside_admin(Request $request){
+    public function create_outside_admin(Request $request)
+    {
 
         $Request_admin = Auth::guard('admin')->user();
 
@@ -379,7 +366,6 @@ use TraitApiResponse;
         return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
     }
 
-
     public function create_violation_admin(Request $request){
 
         $Request_admin = Auth::guard('admin')->user();
@@ -431,7 +417,6 @@ use TraitApiResponse;
 
         return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
     }
-
 
     public function End_Booking_All(Request $request)
     {
@@ -485,9 +470,8 @@ use TraitApiResponse;
 
     }
 
-    public function update_booking_merge(Request $request){
-
-
+    public function update_booking_merge(Request $request)
+    {
     }
 
 }

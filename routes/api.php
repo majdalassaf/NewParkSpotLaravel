@@ -40,6 +40,7 @@ Route::post('Add_Zone',[Zone_Controller::class,'Add_Zone']);
 Route::post('Delete_Zone',[Zone_Controller::class,'Delete_Zone']);
 Route::post('Add_Slots',[SlotController::class,'Add_Slots']);
 Route::post('Delete_Slot',[SlotController::class,'Delete_Slot']);
+Route::post('Add_Slot',[SlotController::class,'Add_Slot']);
 
 
 
