@@ -85,8 +85,7 @@ Route::group([
     Route::post('End_Booking_All',[BookController::class,'End_Booking_All']);
     Route::post('Deposit',[Wallet_AdminController::class,'Deposit']);
 
-
-
+    Route::post('Get_Book_slot',[BookController::class,'Get_Book_slot']);
 
 
 

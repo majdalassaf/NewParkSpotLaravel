@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Car;
 use App\Models\Slot;
+use App\Models\User;
 use App\Models\Zone;
 use App\Models\Booking;
 use App\Models\MergeSlot;
@@ -28,7 +29,7 @@ use TraitApiResponse;
         $end_shift=Carbon::now();
         $start_shift=Carbon::now();
         $end_shift->setTime(0,00);
-        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
+        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(5);
         $difEnd_Now=$end_shift->diffInHours($time_now);
 
 
@@ -185,6 +186,36 @@ use TraitApiResponse;
         $zone = Zone::where('id', $slot->zone_id)->first();
         $book->park_spot = $slot->num_slot;
         $book->zone_name = $zone->name;
+        $book->calc_time=$calc_time;
+
+        return $this->returnResponse($book,"You have a reservation",200);
+
+    }
+    public function Get_Book_slot(Request $request)
+    {
+        $Request_admin = Auth::guard('user')->user();
+
+        $book= Booking::where('slot_id', $request->slot_id)->first();
+        if(!$book)
+            return $this->returnResponse("","You do not have a reservation",400);
+
+        $car_info= Car::where('num_car', $book->num_car)->where('country',$book->country)->first();
+        if($car_info){
+            $user_info= User::where('id', $car_info->user_id)->first();
+
+            $book->name_user = $user_info->name;
+            $book->phone = $user_info->phone;
+            $book->type_car = $car_info->type;
+            $book->color_car = $car_info->color;
+        }
+        else{
+            $book->name_user = null;
+            $book->phone = null;
+            $book->type_car = null;
+            $book->color_car = null;
+        }
+        $current_time=Carbon::now()->tz('Asia/Damascus');
+        $calc_time = $current_time->diffInSeconds($book->endTime_book);
         $book->calc_time=$calc_time;
 
         return $this->returnResponse($book,"You have a reservation",200);
