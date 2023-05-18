@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\TraitApiResponse;
 use App\Models\Booking;
+use App\Models\MergeSlot;
 use App\Models\Zone;
 use Illuminate\Support\Facades\Validator;
 
@@ -104,8 +105,10 @@ use TraitApiResponse;
                     $i->num_car=$slot_status->num_car;
                 }
                 else{
-                    $i->country=null;
-                    $i->num_car=null;
+                    $merge = MergeSlot::where('slot_id', $i->id)->first();
+                    $slot_status = Booking::where('id', $merge->booking_id)->first();
+                    $i->country=$slot_status->country;
+                    $i->num_car=$slot_status->num_car;
                 }
             }
             else{

@@ -194,11 +194,22 @@ use TraitApiResponse;
     public function Get_Book_slot(Request $request)
     {
         $Request_admin = Auth::guard('user')->user();
+        $slot= Slot::where('id', $request->slot_id)->first();
+
+        if(!$slot->status){
+            return $this->returnResponse("","You do not have a reservation",400);
+        }
+
 
         $book= Booking::where('slot_id', $request->slot_id)->first();
-        if(!$book)
-            return $this->returnResponse("","You do not have a reservation",400);
+        if(!$book){
 
+            $merge= MergeSlot::where('slot_id', $request->slot_id)->first();
+            $book= Booking::where('id', $merge->booking_id)->first();
+
+
+
+        }
         $car_info= Car::where('num_car', $book->num_car)->where('country',$book->country)->first();
         if($car_info){
             $user_info= User::where('id', $car_info->user_id)->first();
@@ -218,7 +229,7 @@ use TraitApiResponse;
         $calc_time = $current_time->diffInSeconds($book->endTime_book);
         $book->calc_time=$calc_time;
 
-        return $this->returnResponse($book,"You have a reservation",200);
+        return $this->returnResponse($book,"ok",200);
 
     }
 
