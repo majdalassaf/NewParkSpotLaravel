@@ -103,6 +103,10 @@ use TraitApiResponse;
                     $i->country=$slot_status->country;
                     $i->num_car=$slot_status->num_car;
                 }
+                else{
+                    $i->country=null;
+                    $i->num_car=null;
+                }
             }
             else{
                 $i->country=null;
