@@ -44,6 +44,29 @@ class Wallet_AdminController extends Controller
             ]);
         return true;
     }
+    public function withdraw_money($hours,$type,$admin_id,$book_id,$tran_cost){
+        $wallet_Admin = WalletAdmin::where('admin_id', $admin_id)->first();
+
+        $typepay = TypePay::where("type",$type)->first();
+        $type_cost= $typepay->cost;
+        $cost = ($hours * $type_cost)-$tran_cost;
+        if($cost > 0)
+            $total_cost = ($hours * $type_cost)+$cost;
+        else{
+            $total_cost = $hours * $type_cost;
+        }
+        $new_amount= $wallet_Admin->amount + $total_cost;
+
+        $transaction = app(TransactionController::class);
+        $accept=$transaction-> Create_Transaction_admin($book_id,$typepay->id,$total_cost,$wallet_Admin->id);
+        if (!$accept) {
+        return false;
+        }
+        $wallet_Admin->update([
+            'amount'=>$new_amount
+            ]);
+        return  $total_cost;
+    }
     //تحويل للUSER
     public function Deposit(Request $request)
     {

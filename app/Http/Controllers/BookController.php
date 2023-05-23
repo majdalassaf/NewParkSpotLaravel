@@ -8,8 +8,10 @@ use App\Models\Slot;
 use App\Models\User;
 use App\Models\Zone;
 use App\Models\Booking;
+use App\Models\TypePay;
 use App\Models\MergeSlot;
 use App\Models\WalletUser;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +19,6 @@ use App\Http\Traits\TraitApiResponse;
 use App\Http\Controllers\SlotController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Wallet_UserController;
-use App\Models\TypePay;
 
 class BookController extends Controller{
 use TraitApiResponse;
@@ -449,7 +450,6 @@ use TraitApiResponse;
         if(!$book)
             return $this->returnResponse('',"Your reservation has already expired",400);
 
-
         if($book->violation){
             if($book->merge){
                 $slot_merge=$Merge_Slot_Controller-> get_merge_slot($book->id);
@@ -471,20 +471,22 @@ use TraitApiResponse;
                 return $this->returnResponse('',"Try again, thanks",400);
 
             $walletController = app(Wallet_AdminController::class);
-            if($book->violation){
-                $accept=$walletController-> withdraw($hours,"violation",$Request_admin->id,$book->id);
-                $type_cost= TypePay::where('type','violation')->first();
-                $cost=$hours*($type_cost->cost);
-            }
-            if($book->merge){
-                $accept=$walletController-> withdraw($hours,"merge",$Request_admin->id,$book->id);
-                $type_cost= TypePay::where('type','merge')->first();
-                $cost=$hours*($type_cost->cost);
-            }
 
-            if(!$accept){
-                return $this->returnResponse("","Error transaction",400);
+            $transaction=Transaction::where('book_id',$book->id)->first();
+            if($transaction){
+                $cost=$walletController-> withdraw_money($hours,"violation",$Request_admin->id,$book->id,$transaction->cost);
             }
+            else if($book->merge ||$book->violation){
+                    $accept=$walletController-> withdraw($hours,"merge",$Request_admin->id,$book->id);
+                    $type_cost= TypePay::where('type','merge')->first();
+                    $cost=$hours*($type_cost->cost);
+                }
+            else{
+                    $accept=$walletController-> withdraw($hours,"violation",$Request_admin->id,$book->id);
+                    $type_cost= TypePay::where('type','violation')->first();
+                    $cost=$hours*($type_cost->cost);
+                }
+
             $status=$book->delete();
             if(!$status)
                 return $this->returnResponse('',"Try again, thanks",400);
@@ -496,6 +498,9 @@ use TraitApiResponse;
             return $this->returnResponse('',"Try again, thanks",400);
 
         }
+
+
+
         if($book->merge){
             $slot_merge=$Merge_Slot_Controller-> get_merge_slot($book->id);
             $SlotController->slot_is_empty_id($slot_merge);
@@ -519,6 +524,34 @@ use TraitApiResponse;
 
     public function update_booking_merge(Request $request)
     {
+        $Request_admin = Auth::guard('admin')->user();
+        $end_shift=Carbon::now();
+        $end_shift->setTime(0,00);
+        $book= Booking::where('id', $request->book_id)->first();
+        if(!$book)
+            return $this->returnResponse('',"Your reservation has already expired",400);
+
+        $SlotController = app(SlotController::class);
+        $slot_merge=$SlotController->Book_Slot_name($Request_admin->zone_id,$request->slot_name);
+        if(!$slot_merge)
+            return $this->returnResponse("","No Slots merge Available for This Park",400);
+
+        $status=$book->update([
+            'endTime_book'=>$end_shift,
+            'hours'=>0,
+            'violation'=>true,
+            'merge'=>true,
+            'startTime_violation'=>$book->startTime_book,
+        ]);
+        $SlotController->unlocked($slot_merge);
+        $Merge_Slot_Controller = app(Merge_Slot_Controller::class);
+        $accept=$Merge_Slot_Controller-> create_merge_slot($slot_merge->id,$book->id);
+        $SlotController->unlocked($slot_merge);
+        if($status)
+        return $this->returnResponse('',"Ok",200);
+
+        $slot_empty=$SlotController->slot_is_empty($slot_merge);
+        return $this->returnResponse('',"Try again, thanks",400);
     }
 
     public function type_cost()
