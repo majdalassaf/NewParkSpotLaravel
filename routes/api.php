@@ -89,6 +89,8 @@ Route::group([
     Route::post('Get_Book_slot',[BookController::class,'Get_Book_slot']);
     Route::get('type_cost',[BookController::class,'type_cost']);
     Route::post('update_booking_merge',[BookController::class,'update_booking_merge']);
+    Route::post('Extend_ParkingTime_admin',[BookController::class,'Extend_ParkingTime_admin']);
+
 
 
 

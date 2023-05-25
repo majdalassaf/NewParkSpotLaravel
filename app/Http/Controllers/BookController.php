@@ -561,4 +561,40 @@ use TraitApiResponse;
         return $this->returnResponse($type,"Successfully",200);
 
     }
+
+    public function Extend_ParkingTime_admin(Request $request)
+    {
+        $Request_admin = Auth::guard('admin')->user();
+
+        $end_shift=Carbon::now();
+        $start_shift=Carbon::now();
+        $end_shift->setTime(0,00);
+        $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(10);
+        $difEnd_Now=$end_shift->diffInHours($time_now);
+
+
+        if ( $difEnd_Now >= 21)
+            return $this->returnResponse("","You can't extend the time, the work time has expired, you can park for free",401);
+
+        $book=Booking::find($request->book_id);
+        $new_end_time = Carbon::parse($book->endTime_book);
+        $book->endTime_book = $new_end_time->addHour(intval($request->hours));
+        $new_hours = $book->hours + $request->hours;
+
+        $status=$book->update([
+            'endTime_book'=>$new_end_time,
+            'hours'=>$new_hours,
+            'extends'=>true,
+        ]);
+        if(!$status)
+            return $this->returnResponse('',"The extension has not been completed, please try again",400);
+
+        $walletController = app(Wallet_AdminController::class);
+        $accept=$walletController-> withdraw($request->hours,"extend",$Request_admin->id,$book->id);
+
+        if(!$accept)
+            return $this->returnResponse('',"The extension has not been completed, please try again",400);
+
+        return $this->returnResponse('',"The time has been extended successfully",200);
+    }
 }
