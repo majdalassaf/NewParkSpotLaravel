@@ -18,6 +18,7 @@ class CreateTransactionsTable extends Migration
             $table->integer('book_id');
             $table->integer('typepay_id');
             $table->double('cost');
+            $table->date('date');
             $table->integer('walletuser_id')->nullable();
             $table->integer('walletadmin_id')->nullable();
         });

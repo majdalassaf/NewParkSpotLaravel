@@ -16,6 +16,7 @@ use App\Http\Controllers\Zone_Controller;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Wallet_UserController;
 use App\Http\Controllers\Wallet_AdminController;
+use App\Http\Controllers\Deposit_Controller;
 
 
 /*
@@ -93,6 +94,12 @@ Route::group([
 
     Route::post('Reservation_switch',[BookController::class,'Reservation_switch']);
 
+    Route::get('Get_Transaction_Admin',[TransactionController::class,'Get_Transaction_Admin']);
+    Route::get('Get_Deposit_Admin',[Deposit_Controller::class,'Get_Deposit_Admin']);
+
+    Route::get('Get_Amount',[Wallet_AdminController::class,'Get_Amount']);
+
+
 
 
 
@@ -119,12 +126,13 @@ Route::group([
     Route::post('Update_User_Name',[UserController::class,'Update_User_Name']);
     Route::get('Get_User',[UserController::class,'Get_User']);
     Route::get('Get_Amount',[Wallet_UserController::class,'Get_Amount']);
-    Route::get('Get_Transaction',[TransactionController::class,'Get_Transaction']);
-
+    Route::get('Get_Transaction_User',[TransactionController::class,'Get_Transaction_User']);
     Route::post('Get_Book',[BookController::class,'Get_Book']);
     Route::post('Extend_ParkingTime',[BookController::class,'Extend_ParkingTime']);
     Route::post('End_Booking',[BookController::class,'End_Booking']);
     Route::get('type_cost',[BookController::class,'type_cost']);
+    Route::get('Get_Deposit_User',[Deposit_Controller::class,'Get_Deposit_User']);
+
 
 
 

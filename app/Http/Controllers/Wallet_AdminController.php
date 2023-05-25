@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\TypePay;
 use App\Models\WalletUser;
@@ -25,6 +26,17 @@ class Wallet_AdminController extends Controller
         return true;
 
     }
+    public function Get_Amount()
+{
+    $Request_admin = Auth::guard('admin')->user();
+    $wallet_admin = WalletAdmin::where('admin_id', $Request_admin->id)->first();
+    if($wallet_admin)
+        return $this->returnResponse($wallet_admin->amount,"your amount",200);
+
+    return $this->returnResponse("","Not fount",400);
+
+
+}
 // منشان يقطع المصاري
     public function withdraw($hours,$type,$admin_id,$book_id){
         $wallet_Admin = WalletAdmin::where('admin_id', $admin_id)->first();
@@ -33,9 +45,11 @@ class Wallet_AdminController extends Controller
         $cost= $typepay->cost;
         $total_cost = $hours * $cost;
         $new_amount= $wallet_Admin->amount + $total_cost;
+        $date = Carbon::now()->today()->tz('Asia/Damascus');
+
 
         $transaction = app(TransactionController::class);
-        $accept=$transaction-> Create_Transaction_admin($book_id,$typepay->id,$total_cost,$wallet_Admin->id);
+        $accept=$transaction-> Create_Transaction_admin($book_id,$typepay->id,$total_cost,$date,$wallet_Admin->id);
         if (!$accept) {
         return false;
         }
@@ -56,9 +70,9 @@ class Wallet_AdminController extends Controller
             $total_cost = $hours * $type_cost;
         }
         $new_amount= $wallet_Admin->amount + $total_cost;
-
+        $date = Carbon::now()->today()->tz('Asia/Damascus');
         $transaction = app(TransactionController::class);
-        $accept=$transaction-> Create_Transaction_admin($book_id,$typepay->id,$total_cost,$wallet_Admin->id);
+        $accept=$transaction-> Create_Transaction_admin($book_id,$typepay->id,$total_cost,$date,$wallet_Admin->id);
         if (!$accept) {
         return false;
         }
@@ -98,5 +112,6 @@ class Wallet_AdminController extends Controller
         return $this->returnResponse('',"Successfully Deposit",200);
 
     }
+
 
 }

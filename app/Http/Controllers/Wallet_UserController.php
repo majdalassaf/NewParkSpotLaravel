@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\TypePay;
 use App\Models\WalletUser;
 use Illuminate\Http\Request;
@@ -20,9 +21,10 @@ use TraitApiResponse;
         $cost= $typepay->cost;
         $total_cost = $hours * $cost;
         $new_amount= $wallet_user->amount - $total_cost;
+        $date = Carbon::now()->today()->tz('Asia/Damascus');
 
         $transaction = app(TransactionController::class);
-        $accept=$transaction-> Create_Transaction($book_id,$typepay->id,$total_cost,$wallet_user->id);
+        $accept=$transaction-> Create_Transaction($book_id,$typepay->id,$total_cost,$date,$wallet_user->id);
         if (!$accept) {
         return false;
         }
@@ -31,9 +33,6 @@ use TraitApiResponse;
             ]);
         return true;
 }
-
-
-
 
 // منشان يتاكد اذا في مصاري ولا لا
 public function Check_Amount($hours,$type,$user_id){

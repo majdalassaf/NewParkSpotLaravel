@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Deposite;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\Deposite;
+use App\Models\WalletUser;
+
+use App\Models\WalletAdmin;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 
 class Deposit_Controller extends Controller
@@ -25,5 +30,21 @@ class Deposit_Controller extends Controller
             return false;
 
         return true;
+    }
+    public function Get_Deposit_User()
+    {
+        $Request_user = Auth::guard('user')->user();
+        $wallet_user=WalletUser::where('user_id', $Request_user->id)->first();
+        $Deposit_user = Deposite::where('walletuser_id', $wallet_user->id)->get();
+
+        return $this->returnResponse($Deposit_user,"your Deposite",200);
+    }
+    public function Get_Deposit_Admin()
+    {
+        $Request_admin = Auth::guard('admin')->user();
+        $wallet_admin=WalletAdmin::where('admin_id', $Request_admin->id)->first();
+        $Deposit_user = Deposite::where('walletadmin_id', $wallet_admin->id)->get();
+
+        return $this->returnResponse($Deposit_user,"your Deposite",200);
     }
 }
