@@ -107,7 +107,7 @@ class Wallet_AdminController extends Controller
         ]);
 
         $Deposit_Controller = app(Deposit_Controller::class);
-        $accept=$Deposit_Controller-> Create_Deposit($request->money,$wallet_user->id,$wallet_Admin->id);
+        $accept=$Deposit_Controller-> Create_Deposit($request->money,$wallet_Admin->id,$wallet_user->id);
 
         return $this->returnResponse('',"Successfully Deposit",200);
 
