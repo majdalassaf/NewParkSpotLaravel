@@ -91,6 +91,8 @@ Route::group([
     Route::post('update_booking_merge',[BookController::class,'update_booking_merge']);
     Route::post('Extend_ParkingTime_admin',[BookController::class,'Extend_ParkingTime_admin']);
 
+    Route::post('Reservation_switch',[BookController::class,'Reservation_switch']);
+
 
 
 
