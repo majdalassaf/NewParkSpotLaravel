@@ -476,7 +476,7 @@ use TraitApiResponse;
             if($transaction){
                 $cost=$walletController-> withdraw_money($hours,"violation",$Request_admin->id,$book->id,$transaction->cost);
             }
-            else if($book->merge ||$book->violation){
+            else if($book->merge && $book->violation){
                     $accept=$walletController-> withdraw($hours,"merge",$Request_admin->id,$book->id);
                     $type_cost= TypePay::where('type','merge')->first();
                     $cost=$hours*($type_cost->cost);
