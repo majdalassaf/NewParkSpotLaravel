@@ -43,7 +43,6 @@ class Deposit_Controller extends Controller
     {
         $Request_admin = Auth::guard('admin')->user();
         $wallet_admin=WalletAdmin::where('admin_id', $Request_admin->id)->first();
-        return $wallet_admin;
         $Deposit_admin = Deposite::where('walletadmin_id', $wallet_admin->id)->get();
 
         return $this->returnResponse($Deposit_admin,"your Deposite",200);
