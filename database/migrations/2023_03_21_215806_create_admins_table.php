@@ -18,7 +18,7 @@ class CreateAdminsTable extends Migration
             $table->string('name');
             $table->string('phone')->unique();
             $table->string('password');
-            $table->string('device token');
+            $table->string('device_token');
             $table->integer('zone_id');
         });
     }
