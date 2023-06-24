@@ -17,7 +17,9 @@ use TraitApiResponse;
     public function loginUser(Request $request){
         $rules=[
         "phone"=> "required|max:10|min:10|exists:users,phone",
-        "password"=> "required|min:6"
+        "password"=> "required|min:6",
+        "device_token"=> "required"
+
         ];
         $validator=Validator::make($request->all(),$rules);
         if($validator->fails())
@@ -30,6 +32,11 @@ use TraitApiResponse;
         }
         $user=Auth::guard('user')->user();
         $user -> token=$token;
+        $up_user= User::where('phone', $request->phone)->first();
+        $result=$up_user->update([
+            'device_token'=>$request->device_token,
+        ]);
+
         return $this->returnResponse($user,"Login Successfully",200);;
     }
 
@@ -39,7 +46,9 @@ use TraitApiResponse;
         $rules=[
             "phone"=> "required|max:10|min:10",
             "name"=>  "required",
-            "password"=> "required|min:6"
+            "password"=> "required|min:6",
+            "device_token"=> "required"
+
         ];
         $validator=Validator::make($request->all(),$rules);
         if($validator->fails())
@@ -53,6 +62,7 @@ use TraitApiResponse;
         $user->phone=$request->phone;
         $user->name = $request->name;
         $user->password=bcrypt($request->password);
+        $user->device_token=$request->device_token;
         $result=$user->save();
 
         $Wallet_User = app(Wallet_UserController::class);

@@ -17,11 +17,15 @@ class Admin extends Authenticatable implements JWTSubject
         'name',
         'phone',
         'password',
-        'zone_id'
+        'zone_id',
+        'device_token',
+
     ];
 
     protected $hidden = [
         'password',
+        'device_token',
+
     ];
 
     public function getJWTIdentifier()

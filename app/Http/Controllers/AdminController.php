@@ -18,7 +18,9 @@ public function loginAdmin(Request $request)
     {
     $rules=[
         "phone"=> "required|max:10|min:10|exists:admins,phone",
-        "password"=> "required|min:6"
+        "password"=> "required|min:6",
+        "device_token"=> "required"
+
 
 
     ];
@@ -33,8 +35,13 @@ public function loginAdmin(Request $request)
     if(!$token)
         return $this->returnResponse("","Some Error",400);
 
+
     $admin=Auth::guard('admin')->user();
     $admin -> token=$token;
+    $up_user= admin::where('phone', $request->phone)->first();
+    $result=$up_user->update([
+        'device_token'=>$request->device_token,
+    ]);
     return $this->returnResponse($admin,"Login Successfully",200);;
     }
 
@@ -67,6 +74,8 @@ public function registerAdmin(Request $request) {
     $admin->name = $request->name;
     $admin->password=bcrypt($request->password);
     $admin->zone_id=$request->zone_id;
+    $admin->device_token=null;
+
     $result=$admin->save();
 
     $Wallet_Admin = app(Wallet_AdminController::class);
