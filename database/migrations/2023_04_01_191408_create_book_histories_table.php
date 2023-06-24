@@ -18,6 +18,7 @@ class CreateBookHistoriesTable extends Migration
             $table->string('country');
             $table->string('num_car');
             $table->integer('slot_id');
+            $table->boolean('vip')->default(false);
             $table->date('date');
             $table->integer("hours")->unsigned();
             $table->time("startTime_book");

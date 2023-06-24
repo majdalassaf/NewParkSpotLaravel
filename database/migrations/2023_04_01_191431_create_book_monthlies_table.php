@@ -17,6 +17,7 @@ class CreateBookMonthliesTable extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('slot_id');
+            $table->boolean('vip')->default(false);
             $table->time("startTime_book");
             $table->time("endTime_book");
             $table->boolean('expired')->default(false);

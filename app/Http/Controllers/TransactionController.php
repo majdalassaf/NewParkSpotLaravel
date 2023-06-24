@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    public function Create_Transaction($book_id,$Type_pay_id,$date,$total_cost,$Wallet_user_id=null)
+    public function Create_Transaction($book_id,$Type_pay_id,$total_cost,$date,$Wallet_user_id=null)
     {
         $transaction = new Transaction();
         $transaction->book_id =$book_id ;

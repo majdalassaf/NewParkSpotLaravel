@@ -19,6 +19,7 @@ class CreateBookingsTable extends Migration
             $table->string('num_car');
             $table->unique(['country', 'num_car']);
             $table->integer('slot_id');
+            $table->boolean('vip')->default(false);
             $table->date('date');
             $table->integer("hours")->unsigned();
             $table->time("startTime_book");
@@ -29,6 +30,7 @@ class CreateBookingsTable extends Migration
             $table->boolean('extends')->default(false);
             $table->boolean('merge')->default(false);
             $table->boolean('expired')->default(false);
+
         });
     }
 

@@ -18,7 +18,6 @@ class CreateTransactionMonthliesTable extends Migration
             $table->integer('bookmonthly_id');
             $table->integer('typepay_id');
             $table->double('cost');
-            $table->integer('walletuser_id');
             $table->integer('walletadmin_id');
         });
     }
