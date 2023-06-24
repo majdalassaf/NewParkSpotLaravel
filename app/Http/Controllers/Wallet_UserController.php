@@ -33,6 +33,29 @@ use TraitApiResponse;
             ]);
         return true;
 }
+public function withdraw_vip($hours,$type,$user_id,$book_id){
+    $wallet_user = WalletUser::where('user_id', $user_id)->first();
+
+    $typepay = TypePay::where("type","vip")->first();
+    $vip= $typepay->cost;
+    $typepay = TypePay::where("type",$type)->first();
+    $cost= $typepay->cost;
+    $total_cost = $hours * $cost;
+    $total_cost = $total_cost + $vip;
+    $new_amount= $wallet_user->amount - $total_cost;
+
+    $date = Carbon::now()->today()->tz('Asia/Damascus');
+
+    $transaction = app(TransactionController::class);
+    $accept=$transaction-> Create_Transaction($book_id,$typepay->id,$total_cost,$date,$wallet_user->id);
+    if (!$accept) {
+    return false;
+    }
+    $wallet_user->update([
+        'amount'=>$new_amount
+        ]);
+    return true;
+}
 
 // منشان يتاكد اذا في مصاري ولا لا
 public function Check_Amount($hours,$type,$user_id){
@@ -46,6 +69,20 @@ public function Check_Amount($hours,$type,$user_id){
     }
     return true;
 }
+public function Check_Amount_vip($hours,$type,$user_id){
+    $wallet_user = WalletUser::where('user_id', $user_id)->first();
+    $typepay = TypePay::where("type",'vip')->first();
+    $vip= $typepay->cost;
+    $typepay = TypePay::where("type",$type)->first();
+    $cost= $typepay->cost;
+
+    $amount_needed = ($hours * $cost)+$vip;
+    if ($wallet_user->amount <= $amount_needed){
+        return false;
+    }
+    return true;
+}
+
 
 public function create_wallet_user($user_id){
     $wallet=new WalletUser;

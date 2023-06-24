@@ -29,10 +29,6 @@ use TraitApiResponse;
         $Request_user = Auth::guard('user')->user();
 
         $end_shift=Carbon::now();
-
-
-
-
         $start_shift=Carbon::now();
         $end_shift->setTime(0,00);
         $time_now=Carbon::now()->setTimezone('Asia/Damascus')->subHours(5);
@@ -51,10 +47,17 @@ use TraitApiResponse;
         return $this->returnResponse("","You already have a reservation. You cannot book",400);
 
         $walletController = app(Wallet_UserController::class);
-        $accept=$walletController-> Check_Amount($request->hours,"preivous",$Request_user->id);
 
+        if($request->vip){
+        $accept_vip=$walletController-> Check_Amount_vip($request->hours,"preivous",$Request_user->id);
+        if (!$accept_vip)
+            return $this->returnResponse("","No Amount",400);
+        }
+        if(!$request->vip){
+        $accept=$walletController-> Check_Amount($request->hours,"preivous",$Request_user->id);
         if (!$accept)
-        return $this->returnResponse("","No Amount",400);
+            return $this->returnResponse("","No Amount",400);
+        }
 
 
         $SlotController = app(SlotController::class);
@@ -73,28 +76,36 @@ use TraitApiResponse;
         $book->endTime_book = Carbon::now()->tz('Asia/Damascus')->addHour(intval($request->hours));
         $book->startTime_violation = $end_shift;
         $book->previous=true;
+        if($request->vip)
+        $book->vip=true;
+
         $result = $book->save();
 
 
         if ($result) {
             $walletController = app(Wallet_UserController::class);
-            $accept=$walletController-> withdraw($request->hours,"preivous",$Request_user->id,$book->id);
-
-            if(!$accept){
-                $SlotController->slot_is_empty($slot);
-                $book->delete();
-                return $this->returnResponse("","Error transaction",400);
+            if($request->vip){
+                $accept_vip=$walletController-> withdraw_vip($request->hours,"preivous",$Request_user->id,$book->id);
+                if (!$accept_vip){
+                    $SlotController->slot_is_empty($slot);
+                    $book->delete();
+                    return $this->returnResponse("","Error transaction",400);
+                    }
+                }
+            if(!$request->vip){
+                $accept=$walletController-> withdraw($request->hours,"preivous",$Request_user->id,$book->id);
+                if (!$accept){
+                    $SlotController->slot_is_empty($slot);
+                    $book->delete();
+                    return $this->returnResponse("","Error transaction",400);
+                    }
             }
-
             $SlotController->unlocked($slot);
-
-        return $this->returnResponse('',"Successfully Book",201);
+            return $this->returnResponse('',"Successfully Book",201);
         }
-
+        $SlotController->unlocked($slot);
         $SlotController->slot_is_empty($slot);
-
         return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
-
     }
 
     public function create_book_user_now(Request $request)
@@ -119,11 +130,21 @@ use TraitApiResponse;
         if(Booking::where('num_car', $request->num_car)->where('country',$request->country)->first())
             return $this->returnResponse("","You already have a reservation. You cannot book",400);
 
-        $walletController = app(Wallet_UserController::class);
-        $accept=$walletController-> Check_Amount($request->hours,"preivous",$Request_user->id);
+            $walletController = app(Wallet_UserController::class);
 
-        if (!$accept)
-            return $this->returnResponse("","No Amount",400);
+            if($request->vip){
+            $accept_vip=$walletController-> Check_Amount_vip($request->hours,"hourly",$Request_user->id);
+            if (!$accept_vip)
+                return $this->returnResponse("","No Amount",400);
+            }
+            if(!$request->vip){
+            $accept=$walletController-> Check_Amount($request->hours,"hourly",$Request_user->id);
+            if (!$accept)
+                return $this->returnResponse("","No Amount",400);
+            }
+
+
+
 
         $SlotController = app(SlotController::class);
         $slot=$SlotController-> Book_Slot_id($request->zone_id,$request->slot_id);
@@ -144,16 +165,27 @@ use TraitApiResponse;
 
         if ($result) {
             $walletController = app(Wallet_UserController::class);
-            $accept=$walletController-> withdraw($request->hours,"hourly",$Request_user->id,$book->id);
-
-            if(!$accept){
-                $SlotController->slot_is_empty($slot);
-                $book->delete();
-                return $this->returnResponse("","Error transaction",400);
+            if($request->vip){
+                $accept_vip=$walletController-> withdraw_vip($request->hours,"hourly",$Request_user->id,$book->id);
+                if (!$accept_vip){
+                    $SlotController->slot_is_empty($slot);
+                    $book->delete();
+                    return $this->returnResponse("","Error transaction",400);
+                    }
+                }
+            if(!$request->vip){
+                $accept=$walletController-> withdraw($request->hours,"hourly",$Request_user->id,$book->id);
+                if (!$accept){
+                    $SlotController->slot_is_empty($slot);
+                    $book->delete();
+                    return $this->returnResponse("","Error transaction",400);
+                    }
             }
             $SlotController->unlocked($slot);
             return $this->returnResponse('',"Successfully Book",201);
         }
+
+        $SlotController->unlocked($slot);
         $SlotController->slot_is_empty($slot);
         return $this->returnResponse('',"oops..!!, You Can Not Book on This Park.",400);
     }

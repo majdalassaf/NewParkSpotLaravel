@@ -21,7 +21,6 @@ public function Add_Zone(Request $request)
     $rules=[
         "type"=> "required",
         "name"=>  "required",
-        "capacity"=> "required",
         "lat"=>  "required",
         "lan"=>  "required",
     ];
@@ -31,7 +30,6 @@ public function Add_Zone(Request $request)
     $zone=new Zone;
     $zone->type=$request->type;
     $zone->name = $request->name;
-    $zone->capacity=$request->capacity;
     $zone->lat=$request->lat;
     $zone->lan=$request->lan;
     $result=$zone->save();
