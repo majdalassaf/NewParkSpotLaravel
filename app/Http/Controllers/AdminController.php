@@ -19,6 +19,8 @@ public function loginAdmin(Request $request)
     $rules=[
         "phone"=> "required|max:10|min:10|exists:admins,phone",
         "password"=> "required|min:6"
+
+
     ];
     $validator=Validator::make($request->all(),$rules);
     if($validator->fails())
