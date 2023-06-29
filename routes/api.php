@@ -101,7 +101,6 @@ Route::group([
 
     Route::get('Get_Amount',[Wallet_AdminController::class,'Get_Amount']);
     Route::post('create_book_monthly_admin',[Book_monthly_Controller::class,'create_book_monthly_admin']);
-    Route::post('end_book_monthly_admin',[Book_monthly_Controller::class,'end_book_monthly_admin']);
     Route::post('Get_Book_monthly_admin',[Book_monthly_Controller::class,'Get_Book_monthly_admin']);
     Route::post('End_Book_monthly',[Book_monthly_Controller::class,'End_Book_monthly']);
 
