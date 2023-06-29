@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\TraitApiResponse;
 use App\Models\Booking;
+use App\Models\BookMonthly;
 use App\Models\MergeSlot;
 use App\Models\Zone;
 use Illuminate\Support\Facades\Validator;
@@ -107,15 +108,24 @@ use TraitApiResponse;
         foreach($slot_admin as $i){
             if($i->status==1){
                 $slot_status = Booking::where('slot_id', $i->id)->first();
+                $slot_monthly = BookMonthly::where('slot_id', $i->id)->first();
                 if($slot_status){
                     $i->country=$slot_status->country;
                     $i->num_car=$slot_status->num_car;
+                    $i->book_monthly=false;
+                }
+                elseif($slot_monthly){
+                    $i->country=null;
+                    $i->num_car=null;
+                    $i->book_monthly=true;
+
                 }
                 else{
                     $merge = MergeSlot::where('slot_id', $i->id)->first();
                     $slot_status = Booking::where('id', $merge->booking_id)->first();
                     $i->country=$slot_status->country;
                     $i->num_car=$slot_status->num_car;
+                    $i->book_monthly=false;
                 }
             }
             else{

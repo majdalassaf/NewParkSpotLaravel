@@ -132,6 +132,8 @@ Route::group([
     Route::post('End_Booking',[BookController::class,'End_Booking']);
     Route::get('type_cost',[BookController::class,'type_cost']);
     Route::get('Get_Deposit_User',[Deposit_Controller::class,'Get_Deposit_User']);
+    Route::get('Get_Book_mon',[BookController::class,'Get_Book_mon']);
+
 
 
 
