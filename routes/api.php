@@ -103,6 +103,8 @@ Route::group([
     Route::post('create_book_monthly_admin',[Book_monthly_Controller::class,'create_book_monthly_admin']);
     Route::post('Get_Book_monthly_admin',[Book_monthly_Controller::class,'Get_Book_monthly_admin']);
     Route::post('End_Book_monthly',[Book_monthly_Controller::class,'End_Book_monthly']);
+    Route::post('Reservation_switch_monthly',[Book_monthly_Controller::class,'Reservation_switch_monthly']);
+
 
 
 
@@ -143,7 +145,6 @@ Route::group([
     Route::get('Get_Deposit_User',[Deposit_Controller::class,'Get_Deposit_User']);
     Route::get('Get_Book_monthly_user',[Book_monthly_Controller::class,'Get_Book_monthly_user']);
     Route::post('End_Book_monthly',[Book_monthly_Controller::class,'End_Book_monthly']);
-    Route::post('Reservation_switch_monthly',[Book_monthly_Controller::class,'Reservation_switch_monthly']);
 
 
 
