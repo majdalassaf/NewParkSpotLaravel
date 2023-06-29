@@ -158,4 +158,31 @@ class Book_monthly_Controller extends Controller
 
     }
 
+    public function Reservation_switch_monthly(Request $request)
+    {
+        $Request_admin = Auth::guard('admin')->user();
+        $SlotController = app(SlotController::class);
+        $book= BookMonthly::where('id',$request->book_id)->first();
+        if(!$book)
+            return $this->returnResponse('',"Your reservation does not exist",400);
+
+
+        $slot_old= Slot::where('id',$book->slot_id)->first();
+
+        $slot_switch=$SlotController->Book_Slot_name($Request_admin->zone_id,$request->slot_name);
+        if(!$slot_switch)
+            return $this->returnResponse("","Switch is not available for this slot",400);
+
+        $status=$book->update([
+            'slot_id'=>$slot_switch->id,
+        ]);
+        if(!$status)
+            return $this->returnResponse("","try again",400);
+
+        $slot_empty=$SlotController->slot_is_empty($slot_old);
+        $SlotController->unlocked($slot_switch);
+        return $this->returnResponse('',"switch successfully",200);
+
+    }
+
 }
