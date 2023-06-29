@@ -19,6 +19,8 @@ use App\Http\Traits\TraitApiResponse;
 use App\Http\Controllers\SlotController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Wallet_UserController;
+use App\Http\Controllers\Wallet_AdminController;
+
 
 class BookController extends Controller{
 use TraitApiResponse;

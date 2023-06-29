@@ -10,6 +10,8 @@ use App\Models\BookMonthly;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\SlotController;
+use App\Http\Controllers\Wallet_AdminController;
+
 
 class Book_monthly_Controller extends Controller
 {
@@ -56,10 +58,10 @@ class Book_monthly_Controller extends Controller
         if ($result) {
             $walletController = app(Wallet_AdminController::class);
             if($request->vip){
-                $accept=$walletController-> withdraw_monthly($request->hours,"monthly_vip",$Request_admin->id,$book->id);
+                $accept=$walletController-> withdraw_monthly("monthly_vip",$Request_admin->id,$book->id);
             }
             else {
-                $accept=$walletController-> withdraw_monthly($request->hours,"monthly",$Request_admin->id,$book->id);
+                $accept=$walletController-> withdraw_monthly("monthly",$Request_admin->id,$book->id);
             }
             if(!$accept){
                 $SlotController->slot_is_empty($slot);
