@@ -17,6 +17,8 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Wallet_UserController;
 use App\Http\Controllers\Wallet_AdminController;
 use App\Http\Controllers\Deposit_Controller;
+use App\Http\Controllers\Book_monthly_Controller;
+
 
 
 /*
@@ -98,6 +100,12 @@ Route::group([
     Route::get('Get_Deposit_Admin',[Deposit_Controller::class,'Get_Deposit_Admin']);
 
     Route::get('Get_Amount',[Wallet_AdminController::class,'Get_Amount']);
+    Route::post('create_book_monthly_admin',[Book_monthly_Controller::class,'create_book_monthly_admin']);
+    Route::post('end_book_monthly_admin',[Book_monthly_Controller::class,'end_book_monthly_admin']);
+    Route::post('Get_Book_monthly_admin',[Book_monthly_Controller::class,'Get_Book_monthly_admin']);
+
+
+
 
 
 
@@ -132,7 +140,8 @@ Route::group([
     Route::post('End_Booking',[BookController::class,'End_Booking']);
     Route::get('type_cost',[BookController::class,'type_cost']);
     Route::get('Get_Deposit_User',[Deposit_Controller::class,'Get_Deposit_User']);
-    Route::get('Get_Book_mon',[BookController::class,'Get_Book_mon']);
+    Route::get('Get_Book_monthly_user',[Book_monthly_Controller::class,'Get_Book_monthly_user']);
+
 
 
 

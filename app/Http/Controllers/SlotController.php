@@ -131,6 +131,8 @@ use TraitApiResponse;
             else{
                 $i->country=null;
                 $i->num_car=null;
+                $i->book_monthly=false;
+
             }
         }
         if($slot_admin)
