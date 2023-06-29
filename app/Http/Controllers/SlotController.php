@@ -108,7 +108,7 @@ use TraitApiResponse;
         foreach($slot_admin as $i){
             if($i->status==1){
                 $slot_status = Booking::where('slot_id', $i->id)->first();
-                $slot_monthly = BookMonthly::where('slot_id', $i->id)->first();
+                $slot_monthly = BookMonthly::where('slot_id', $i->id)->where('expired', false)->first();
                 if($slot_status){
                     $i->country=$slot_status->country;
                     $i->num_car=$slot_status->num_car;
