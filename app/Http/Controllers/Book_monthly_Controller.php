@@ -33,12 +33,6 @@ class Book_monthly_Controller extends Controller
         if ($difEnd_Now < 8 )
         return $this->returnResponse("","You can't book, the working time hasn't started, the time starts at 08:00 AM ",401);
 
-
-        $SlotController = app(SlotController::class);
-        $slot=$SlotController-> Book_Slot_id($Request_admin->zone_id,$request->slot_id);
-        if (!$slot){
-            return $this->returnResponse("","No Slots Available for This Park",400);
-        }
         $user_id= User::where('phone', $request->phone)->first();
         if(!$user_id)
             return $this->returnResponse('',"Please check the entry number",400);
@@ -46,6 +40,13 @@ class Book_monthly_Controller extends Controller
         $accept= BookMonthly::where('user_id', $user_id->id)->where('expired', false)->first();
         if($accept)
         return $this->returnResponse('',"He already has a monthly reservation",400);
+
+
+        $SlotController = app(SlotController::class);
+        $slot=$SlotController-> Book_Slot_id($Request_admin->zone_id,$request->slot_id);
+        if (!$slot){
+            return $this->returnResponse("","No Slots Available for This Park",400);
+        }
 
         $book = new BookMonthly();
         $book->user_id = $user_id->id;
