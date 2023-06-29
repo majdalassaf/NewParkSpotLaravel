@@ -41,7 +41,7 @@ class Book_monthly_Controller extends Controller
         if(!$user_id)
             return $this->returnResponse('',"Please check the entry number",400);
 
-        $accept= BookMonthly::where('user_id', $user_id->id)->first();
+        $accept= BookMonthly::where('user_id', $user_id->id)->where('expired', false)->first();
         if($accept)
         return $this->returnResponse('',"He already has a monthly reservation",400);
 
