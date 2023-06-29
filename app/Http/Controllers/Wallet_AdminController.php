@@ -113,5 +113,26 @@ class Wallet_AdminController extends Controller
 
     }
 
+    public function withdraw_monthly($hours,$type,$admin_id,$book_id){
+        $wallet_Admin = WalletAdmin::where('admin_id', $admin_id)->first();
+
+        $typepay = TypePay::where("type",$type)->first();
+        $cost= $typepay->cost;
+        $total_cost = $hours * $cost;
+        $new_amount= $wallet_Admin->amount + $total_cost;
+        $date = Carbon::now()->today()->tz('Asia/Damascus');
+
+
+        $transaction = app(Transaction_monthly_Controller::class);
+        $accept=$transaction-> Create_Transaction_admin($book_id,$typepay->id,$total_cost,$date,$wallet_Admin->id);
+        if (!$accept) {
+        return false;
+        }
+        $wallet_Admin->update([
+            'amount'=>$new_amount
+            ]);
+        return true;
+    }
+
 
 }

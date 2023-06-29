@@ -56,10 +56,10 @@ class Book_monthly_Controller extends Controller
         if ($result) {
             $walletController = app(Wallet_AdminController::class);
             if($request->vip){
-                $accept=$walletController-> withdraw($request->hours,"monthly_vip",$Request_admin->id,$book->id);
+                $accept=$walletController-> withdraw_monthly($request->hours,"monthly_vip",$Request_admin->id,$book->id);
             }
             else {
-                $accept=$walletController-> withdraw($request->hours,"monthly",$Request_admin->id,$book->id);
+                $accept=$walletController-> withdraw_monthly($request->hours,"monthly",$Request_admin->id,$book->id);
             }
             if(!$accept){
                 $SlotController->slot_is_empty($slot);
@@ -130,6 +130,28 @@ class Book_monthly_Controller extends Controller
         $book->calc_time=$calc_time;
 
         return $this->returnResponse($book,"ok",200);
+
+    }
+    public function End_Book_monthly(Request $request)
+    {
+        $book= BookMonthly::where('id', $request->book_id)->first();
+        if(!$book)
+            return $this->returnResponse('',"Your reservation has already expired",400);
+
+
+        $status=$book->update([
+                'expired'=>true,
+                'endTime_book'=>Carbon::now()->today()->tz('Asia/Damascus'),
+            ]);
+        if(!$status)
+            return $this->returnResponse('',"Try again, thanks",400);
+
+        $SlotController = app(SlotController::class);
+        $slot=$SlotController-> slot_is_empty_id($book->slot_id);
+        if($slot)
+            return $this->returnResponse('',"Your reservation has been completed.",200);
+
+        return $this->returnResponse('',"Try again, thanks",400);
 
     }
 
