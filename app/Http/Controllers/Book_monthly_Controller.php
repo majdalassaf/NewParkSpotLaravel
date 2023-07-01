@@ -160,6 +160,10 @@ class Book_monthly_Controller extends Controller
 
     public function Reservation_switch_monthly(Request $request)
     {
+
+
+
+
         $Request_admin = Auth::guard('admin')->user();
         $SlotController = app(SlotController::class);
         $book= BookMonthly::where('id',$request->book_id)->first();
